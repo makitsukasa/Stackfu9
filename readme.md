@@ -27,8 +27,8 @@ twitter:@tsukasa_boxy
 - " (dup   ) : duplicate stack top.
 - ^ (jump  ) : pop 1, jump
 - % (roll  ) : pop 1, roll
-- . (output) : input a character and push
-- , (input ) : pop 1, output the character
+- . (output) : pop 1, output the character
+- , (input ) : input a character and push
 
 ###jump
 Pop stack top and let this be n.  
