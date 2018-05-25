@@ -1,29 +1,29 @@
 # Stackfu9
 Stackfu9 interpreter in python.
 
-## Stackfu9
-- is esolang I invented
-- is inspired by brainfuck
-- is not derived from brainfuck
-- is pronounced as "stack fuck"
-  - 9 is "kyuu" or "ku" in Japanese
-- is not related to [Stackfuck](https://github.com/fxcqz/stackfuck)
-  - sorry for confusing
-- has a stack
-- has 9 operands
-- is turing complete
+## Stackfu9 is
+- esolang I invented
+- one-stack-oriented
+- composed of 9 operands
+- turing complete
   - I'll make it [ELVM](https://github.com/shinh/elvm) backend
+- inspired by brainfuck
+- not derived from brainfuck
+- pronounced as "stack fuck"
+  - 9 is "kyuu" or "ku" in Japanese
+- not related to [Stackfuck](https://github.com/fxcqz/stackfuck)
+  - sorry for confusing
 
 ## Operands
-- 0 (zero  ) : push 0
-- \+ (add   ) : pop 2, add, then push
-- \- (sub   ) : pop 2, sub, then push
-- = (equal ) : pop 2, push 1(equal) or 0(not)
-- " (dup   ) : duplicate stack top.
-- ^ (jump  ) : pop 1, jump
-- % (roll  ) : pop 1, roll
-- . (output) : pop 1, output the character
-- , (input ) : input a character and push
+- 0  (zero)   : push 0
+- \+ (add)    : pop 2 elements, add, then push
+- \- (sub)    : pop 2 elements, sub, then push
+- =  (equal)  : pop 2 elements, push 1(equal) or 0(not)
+- "  (dup)    : duplicate stack top.
+- ^  (jump)   : pop 1 element, jump
+- %  (roll)   : pop 1 element, roll
+- .  (output) : pop 1 element, output the character
+- ,  (input)  : input a character and push
 
 **jump**  
 Pop stack top and let this be n.  
