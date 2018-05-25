@@ -24,7 +24,7 @@ twitter:@tsukasa_boxy
 - + (add   ) : pop 2, add, then push
 - - (sub   ) : pop 2, sub, then push
 - = (equal ) : pop 2, push 1(equal) or 0(not)
-" (dup   ) : duplicate stack top.
+- " (dup   ) : duplicate stack top.
 - ^ (jump  ) : pop 1, jump
 - % (roll  ) : pop 1, roll
 - . (output) : input a character and push
