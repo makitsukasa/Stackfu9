@@ -11,7 +11,7 @@ twitter:@tsukasa_boxy
 - inspired by brainfuck
 - not derived from brainfuck
 - not related to [Stackfuck](https://github.com/fxcqz/stackfuck)
-  - sorry confusing
+  - sorry for confusing
 
 ## Stackfu9
 - has a stack
