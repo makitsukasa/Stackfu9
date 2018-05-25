@@ -12,6 +12,8 @@ class Element:
 				sys.exit(1)
 		elif isinstance(n, int):
 			self.n = n
+		elif isinstance(n, Element):
+			self.n = n.asInteger()
 		else:
 			print("internal error : neither int nor char in Element.constructor")
 			sys.exit(1)
@@ -41,11 +43,11 @@ class Stack:
 	def __init__(self):
 		self.stack = []
 
-	def push(self, number):
-		if not isinstance(number, Element):
+	def push(self, element):
+		if not isinstance(element, Element):
 			print("internal error : only Element can stack")
 			sys.exit(1)
-		self.stack.append(number)
+		self.stack.append(element)
 
 	def pop(self):
 		if len(self.stack) <= 0:
@@ -75,13 +77,13 @@ def opPushZero():
 def opAdd():
 	x = stack.pop()
 	y = stack.pop()
-	stack.push(x + y)
+	stack.push(Element(x + y))
 	return 0
 
 def opSubstruct():
 	x = stack.pop()
 	y = stack.pop()
-	stack.push(x + y)
+	stack.push(Element(x - y))
 	return 0
 
 def opDuplicate():
@@ -93,7 +95,7 @@ def opDuplicate():
 def opEqual():
 	x = stack.pop()
 	y = stack.pop()
-	stack.push(x == y)
+	stack.push(Element(1 if (x == y) else 0))
 	return 0
 
 def opInput():
