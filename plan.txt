@@ -1,0 +1,34 @@
+boxy tw:@tsukasa_boxy
+
+Fuckstack is
+- inspired by brainfuck
+- not derived from brainfuck
+- not related to Stackfuck https://github.com/fxcqz/stackfuck
+  * sorry confusing
+
+Fuckstack
+- has 1 stack
+- has 9 operands
+- is turing complete
+
+there is operands
+0 (zero  ) : push 0
++ (add   ) : pop 2, add, then push
+- (sub   ) : pop 2, sub, then push
+= (equal ) : pop 2, push 1(equal) or 0(not)
+" (dup   ) : duplicate stack top.
+^ (jump  ) : pop 1, jump
+% (roll  ) : pop 1, roll
+. (input ) : pop 1, output the character
+, (output) : input a character and push
+
+jump
+	Pop stack top and let this be n.
+	If n is positive, jump right n-th.
+	If n is negative, jump left n-th.
+	(It is not "Jump to label".)
+
+roll
+	Pop stack top and let this be n.
+	Repeat the following procedure n times.
+		Pop the stack top and insert it at the n-th of stack.
