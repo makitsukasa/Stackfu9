@@ -56,6 +56,12 @@ class Stack:
 			sys.exit(1)
 		return self.stack.pop(len(self.stack) - 1)
 
+	def roll(self, depth):
+		if depth <= 0:
+			return
+		self.stack.insert(-depth + 1, self.stack.pop())
+		return
+
 	def __str__(self):
 		retStr = ""
 		for elem in self.stack:
@@ -106,7 +112,7 @@ def opOutput():
 	return 0
 
 def opRoll():
-	# TODO
+	stack.roll(stack.pop().asInteger())
 	return 0
 
 def opJump():
