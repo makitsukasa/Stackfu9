@@ -1,19 +1,14 @@
 # Stackfu9
-boxy
-
-twitter:@tsukasa_boxy
-
-
-## Stackfu9 is
-
-- pronounced "stack fuck"
-  - 9 is "kyuu" or "ku" in Japanese
-- inspired by brainfuck
-- not derived from brainfuck
-- not related to [Stackfuck](https://github.com/fxcqz/stackfuck)
-  - sorry for confusing
+Stackfu9 interpreter in python.
 
 ## Stackfu9
+- is esolang I invented
+- is inspired by brainfuck
+- is not derived from brainfuck
+- is pronounced as "stack fuck"
+  - 9 is "kyuu" or "ku" in Japanese
+- is not related to [Stackfuck](https://github.com/fxcqz/stackfuck)
+  - sorry for confusing
 - has a stack
 - has 9 operands
 - is turing complete
