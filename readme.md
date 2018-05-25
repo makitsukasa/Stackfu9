@@ -30,13 +30,13 @@ twitter:@tsukasa_boxy
 - . (output) : input a character and push
 - , (input ) : pop 1, output the character
 
-####jump
+###jump
 Pop stack top and let this be n.  
 If n is positive, jump right n-th.  
 If n is negative, jump left n-th.  
 (I mean "Jump n-th", not "Jump to label".)
 
-####roll
+###roll
 Pop stack top and let this be n.  
 Pop the stack top and insert it at the n-th of stack.
 
