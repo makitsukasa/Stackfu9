@@ -13,12 +13,12 @@ class Element:
 		elif isinstance(n, int):
 			self.n = n
 		elif isinstance(n, Element):
-			self.n = n.asInteger()
+			self.n = n.asNumber()
 		else:
 			print("internal error : neither int nor char in Element.constructor")
 			sys.exit(1)
 
-	def asInteger(self):
+	def asNumber(self):
 		return self.n
 
 	def asCharacter(self):
@@ -27,17 +27,17 @@ class Element:
 		return chr(self.n)
 
 	def __eq__(self, other):
-		if self.n == other.asInteger():
+		if self.n == other.asNumber():
 			return Element(1)
 		else:
 			return Element(0)
 
 	def __add__(self, other):
-		val = self.n + other.asInteger();
+		val = self.n + other.asNumber();
 		return Element(val);
 
 	def __str__(self):
-		return "" + str(self.asInteger()) + "(" + self.asCharacter() + ")"
+		return "" + str(self.asNumber()) + "(" + self.asCharacter() + ")"
 
 class Stack:
 	def __init__(self):
@@ -114,11 +114,11 @@ def opOutput():
 	return 0
 
 def opRoll():
-	stack.roll(stack.pop().asInteger())
+	stack.roll(stack.pop().asNumber())
 	return 0
 
 def opJump():
-	return stack.pop().asInteger()
+	return stack.pop().asNumber()
 
 
 opDic = {
