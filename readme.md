@@ -21,8 +21,8 @@ twitter:@tsukasa_boxy
 
 ## Operands
 - 0 (zero  ) : push 0
-- + (add   ) : pop 2, add, then push
-- - (sub   ) : pop 2, sub, then push
+- \+ (add   ) : pop 2, add, then push
+- \- (sub   ) : pop 2, sub, then push
 - = (equal ) : pop 2, push 1(equal) or 0(not)
 - " (dup   ) : duplicate stack top.
 - ^ (jump  ) : pop 1, jump
