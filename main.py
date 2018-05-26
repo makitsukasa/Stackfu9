@@ -105,7 +105,7 @@ def opInput():
 
 def opOutput():
 	if DEBUG_OUTPUT:
-		print("STDOUT:", end = '')
+		print('STDOUT:', end = '')
 		#print(stack.pop().asCharacter(), end = '')
 		print(stack.pop(), sep = '')
 	else:
