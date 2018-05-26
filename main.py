@@ -8,14 +8,14 @@ class Element:
 			if(len(n) == 1):
 				self.n = ord(n)
 			else:
-				print("internal error : long str in Element.constructor")
+				print('internal error : long str in Element.constructor')
 				sys.exit(1)
 		elif isinstance(n, int):
 			self.n = n
 		elif isinstance(n, Element):
 			self.n = n.asNumber()
 		else:
-			print("internal error : neither int nor char in Element.constructor")
+			print('internal error : neither int nor char in Element.constructor')
 			sys.exit(1)
 
 	def asNumber(self):
@@ -23,7 +23,7 @@ class Element:
 
 	def asCharacter(self):
 		if self.n < 32:
-			return ""
+			return ''
 		return chr(self.n)
 
 	def __eq__(self, other):
@@ -37,7 +37,7 @@ class Element:
 		return Element(val);
 
 	def __str__(self):
-		return "" + str(self.asNumber()) + "(" + self.asCharacter() + ")"
+		return '' + str(self.asNumber()) + '(' + self.asCharacter() + ')'
 
 class Stack:
 	def __init__(self):
@@ -45,16 +45,16 @@ class Stack:
 
 	def push(self, element):
 		if not isinstance(element, Element):
-			print("internal error : only Element can stack")
+			print('internal error : only Element can stack')
 			sys.exit(1)
 		self.stack.append(element)
 
 	def pop(self):
 		if len(self.stack) <= 0:
 			if DEBUG_OUTPUT:
-				print("runtime error : pop is called but stack is empty")
+				print('runtime error : pop is called but stack is empty')
 			else:
-				sys.stderr.write("runtime error : pop is called but stack is empty\n")
+				sys.stderr.write('runtime error : pop is called but stack is empty\n')
 			sys.exit(1)
 		return self.stack.pop(len(self.stack) - 1)
 
@@ -65,9 +65,9 @@ class Stack:
 		return
 
 	def __str__(self):
-		retStr = ""
+		retStr = ''
 		for elem in self.stack:
-			retStr += str(elem) + ", "
+			retStr += str(elem) + ', '
 		return retStr
 
 def opPushZero():
@@ -105,12 +105,12 @@ def opInput():
 
 def opOutput():
 	if DEBUG_OUTPUT:
-		print("STDOUT:", end = "")
-		#print(stack.pop().asCharacter(), end = "")
-		print(stack.pop(), sep = "")
+		print("STDOUT:", end = '')
+		#print(stack.pop().asCharacter(), end = '')
+		print(stack.pop(), sep = '')
 	else:
-		#print(stack.pop().asCharacter(), end = "")
-		print(stack.pop(), end = "")
+		#print(stack.pop().asCharacter(), end = '')
+		print(stack.pop(), end = '')
 	return 0
 
 def opRoll():
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	i = 0
 	if DEBUG_OUTPUT:
 		while i < len(source):
-			info = str(i) + " : " + source[i]
+			info = str(i) + ' : ' + source[i]
 			i += opDic[source[i]]() + 1
 			print(info, stack)
 
