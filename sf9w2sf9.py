@@ -100,7 +100,7 @@ def resolveJump(source):
 			i += 1
 
 		ans += '"0='
-		num = len(ans_in_loop) + PICKNUMBER_OVERHEAD_WITH_HEADER
+		num = len(ans_in_loop) + PICKNUMBER_OVERHEAD_WITH_HEADER + 1
 		ans += list(opImmidiateValue(num,
 				header = False, fill = PICKNUMBER_OVERHEAD))
 		ans += '^'
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 	#source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
 
 	# goto test
-	source_string = 'A[00=-".]^'
+	source_string = 'A[00=-".]^00=""+"++"+.D[00="+-".]^'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
