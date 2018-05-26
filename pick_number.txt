@@ -1,13 +1,24 @@
 Do you think that you can not push arbitrary numbers on the stack?
 No need to worry.
 
-You can push -255 ~ 0   values within 3+24 characters.
-You can push  0 ~ 10000 values within 3+40 characters.
+You can push -255 ~ 0  values within 3+24 characters.
+You can push 0 ~ 10000 values within 3+40 characters.
 
 You can push 0 at top of the stack with operand  ( 1  character ) '0'
 You can push 1 at top of the stack with operands (3+0 characters) '00='
 You can push 2 at top of the stack with operands ( +2 characters) '00="+'
 You can push 3 at top of the stack with operands (  4 characters) '00=""++'
+
+Also you can push negative values. -N is '00="(-N - 1)-'
+ex.  3 is '00= ""++ '
+    -2 is '00="""++-'
+
+'(N)000=%-' is another way to push -N.
+ex.  3 is '00=""++      '
+    -3 is '00=""++000=%-'
+
+
+Here is how to pick arbitrary numbers.
 
 -255 is 18 chars ""+"+"+"+"+"+"+"+-
 -254 is 18 chars "+""+"+"+"+"+"+"+-
