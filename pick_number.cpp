@@ -4,7 +4,7 @@
 using namespace std;
 
 #define DUMMY_STRING "DUMMY_STRING"
-const int RANGE = 10040;
+const int RANGE = 20100;
 
 vector<int> prime_table;
 vector<string> memo(RANGE + 1, DUMMY_STRING);
