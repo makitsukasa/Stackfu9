@@ -75,14 +75,14 @@ def opPushZero():
 	return 0
 
 def opAdd():
-	x = stack.pop()
-	y = stack.pop()
+	y = stack.pop().asNumber()
+	x = stack.pop().asNumber()
 	stack.push(Element(x + y))
 	return 0
 
 def opSubstruct():
-	x = stack.pop()
-	y = stack.pop()
+	y = stack.pop().asNumber()
+	x = stack.pop().asNumber()
 	stack.push(Element(x - y))
 	return 0
 
@@ -93,8 +93,8 @@ def opDuplicate():
 	return 0
 
 def opEqual():
-	x = stack.pop()
-	y = stack.pop()
+	y = stack.pop().asNumber()
+	x = stack.pop().asNumber()
 	stack.push(Element(1 if (x == y) else 0))
 	return 0
 
@@ -140,7 +140,10 @@ if __name__ == '__main__':
 	#source = '00=""+"+"++"+"+"+.00=""""++"+"++"+"+"++.'
 
 	# roll test
-	source = '000="00=+"00=+"00=+"00=+00="+"+%......'
+	#source = '000="00=+"00=+"00=+"00=+00="+"+%......'
+
+	# print integer
+	source = '00="""+"++"++""+"++""++.'
 
 	i = 0
 	if DEBUG_OUTPUT:
