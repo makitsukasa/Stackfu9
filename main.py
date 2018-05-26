@@ -95,7 +95,8 @@ def opDuplicate():
 def opEqual():
 	y = stack.pop().asNumber()
 	x = stack.pop().asNumber()
-	stack.push(Element(1 if (x == y) else 0))
+	ans = 1 if (x == y) else 0
+	stack.push(Element(ans))
 	return 0
 
 def opInput():
@@ -135,25 +136,36 @@ opDic = {
 
 stack = Stack()
 
-if __name__ == '__main__':
-	# print Hi
-	#source = '00=""+"+"++"+"+"+.00=""""++"+"++"+"+"++.'
-
-	# roll test
-	#source = '000="00=+"00=+"00=+"00=+00="+"+%......'
-
-	# print integer
-	source = '00="""+"++"++""+"++""++.'
-
+def run(source):
 	i = 0
 	if DEBUG_OUTPUT:
 		while i < len(source):
-			info = str(i) + ' : ' + source[i]
+			print(str(i) + ' : ' + source[i], end = ' ')
 			i += opDic[source[i]]() + 1
-			print(info, stack)
+			print(stack)
 
 	else:
 		while i < len(source):
 			i += opDic[source[i]]() + 1
 
 	print()
+
+if __name__ == '__main__':
+	#DEBUG_OUTPUT = False
+
+	# print Hi
+	#source = '00=""+"+"++"+"+"+.00=""""++"+"++"+"+"++.'
+
+	# print Hello World!
+	#source = '00=""++""++"+"+"+.00="""+"++""+"++"+"++.00=""++""++""++"+"+.00=""++""++""++"+"+.00="""++""++"+"++""++.00="+"+"+"+"+.00="""++"++""+"+"+"++.00="""++""++"+"++""++.00="""++""++"++""++"+.00=""++""++""++"+"+.00=""+"++""+"++"+"+.00=""+"+"+"+"++.'
+
+	# roll test
+	#source = '000="00=+"00=+"00=+"00=+00="+"+%......'
+
+	# print integer
+	#source = '00="""+"++"++""+"++""++.'
+
+	# loop test
+	source = '00=""+"+"+"+"+"++"0=""+"+"+"++""++0+0+0+0+0+0+0+0+0+0+0+0+0+0+^00=-".00="""+"+"+"+"++""++0+0+0+0+0+0+0+0+0+0+0+0+-^'
+
+	run(source)
