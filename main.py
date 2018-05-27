@@ -2,6 +2,8 @@ import sys;
 
 DEBUG_OUTPUT = True
 
+# element of the stack
+# each element contains bignum
 class Element:
 	def __init__(self, n):
 		if isinstance(n, str):
@@ -27,18 +29,17 @@ class Element:
 		return chr(self.n)
 
 	def __eq__(self, other):
-		if self.n == other.asNumber():
-			return Element(1)
-		else:
-			return Element(0)
+		return self.asNumber() == other.asNumber()
 
 	def __add__(self, other):
 		val = self.n + other.asNumber();
 		return Element(val);
 
 	def __str__(self):
-		return '' + str(self.asNumber()) + '(' + self.asCharacter() + ')'
+		return str(self.asNumber()) + '(' + self.asCharacter() + ')'
 
+# just wrapper of array
+# unlimited stack size
 class Stack:
 	def __init__(self):
 		self.stack = []
@@ -70,6 +71,10 @@ class Stack:
 			retStr += str(elem) + ', '
 		return retStr
 
+# how each operand works
+# @return how many program counter moves
+# - jump : any value
+# - other : 0
 def opPushZero():
 	stack.push(Element(0))
 	return 0
@@ -136,7 +141,7 @@ opDic = {
 
 stack = Stack()
 
-def run(source):
+def execute(source):
 	i = 0
 	if DEBUG_OUTPUT:
 		while i < len(source):
@@ -172,4 +177,4 @@ if __name__ == '__main__':
 	# count down in count down
 	source = '00="+""+"++"0=""+"++""+"++""++"+0+0+0+0+0+0+0+0+0+0+0+0+^""0="""++"+"++"+"+0+0+0+0+0+0+0+0+0+0+0+0+0+0+^".00=-00="""+"+"+"+"++""++0+0+0+0+0+0+0+0+0+0+0+0+-^^00=-00="""""++"+"+"+"++"+"++0+0+0+0+0+0+0+0+0+0+-^^'
 
-	run(source)
+	execute(source)
