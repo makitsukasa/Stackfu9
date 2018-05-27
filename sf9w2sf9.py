@@ -74,9 +74,6 @@ def resolveImmediateValue(source):
 			ans += opImmidiateValue(ord(op))
 	return ans
 
-def pickNumber(val):
-	return val
-
 def resolveJump(source):
 	i = 0
 	ans = []
@@ -118,7 +115,8 @@ if __name__ == '__main__':
 	#source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
 
 	# goto test
-	source_string = 'A[00=-".]^00=""+"++"+.D[00="+-".]^'
+	#source_string = 'A[00=-".]^D[00="+"+-".]^'
+	source_string = '00="+""+"++[00=-".]^'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
