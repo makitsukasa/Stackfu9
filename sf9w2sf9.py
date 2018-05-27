@@ -145,7 +145,11 @@ if __name__ == '__main__':
 	#source_string = '00="+""+"++[00=-".]^'
 
 	# nested loop
-	source_string = '00="+""+"++["[".00=-]^00=-]^'
+	#source_string = '00="+""+"++["[".00=-]^00=-]^'
+
+	# positive or negative
+	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
+	source_string = '00="+"+"+000=%-"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
