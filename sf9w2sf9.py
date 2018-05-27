@@ -87,10 +87,22 @@ def resolveJump(source):
 			i += 1
 			continue
 
-		ans_in_loop = ""
+		ans_in_loop = []
 		i += 1
 		while source[i] is not ']':
-			ans_in_loop += source[i]
+			if source[i] is '[':
+				print("nest detected")
+				nested_part = []
+				while source[i] is not ']':
+					nested_part += source[i]
+					i += 1
+				nested_part += ']'
+				print(''.join(nested_part))
+				ans_in_loop += resolveJump(nested_part)
+				#ans_in_loop += nested_part
+
+			else:
+				ans_in_loop += source[i]
 			if i >= len(source):
 				print("error : ']' is not found after '['")
 				return ""
@@ -116,10 +128,14 @@ if __name__ == '__main__':
 
 	# goto test
 	#source_string = 'A[00=-".]^D[00="+"+-".]^'
-	source_string = '00="+""+"++[00=-".]^'
+	#source_string = '00="+""+"++[00=-".]^'
+
+	# nested loop
+	source_string = '00="+""+"++["[".00=-]^00=-]^'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
+	print(''.join(source))
 	source = resolveJump(source)
 
 	#print(source)
