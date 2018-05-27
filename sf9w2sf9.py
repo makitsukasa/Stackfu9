@@ -91,13 +91,13 @@ def resolveJump(source):
 		i += 1
 		while source[i] is not ']':
 			if source[i] is '[':
-				print("nest detected")
+				#print("nest detected")
 				nested_part = []
 				while source[i] is not ']':
 					nested_part += source[i]
 					i += 1
 				nested_part += ']'
-				print(''.join(nested_part))
+				#print(''.join(nested_part))
 				ans_in_loop += resolveJump(nested_part)
 				#ans_in_loop += nested_part
 
@@ -135,7 +135,6 @@ if __name__ == '__main__':
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
-	print(''.join(source))
 	source = resolveJump(source)
 
 	#print(source)
