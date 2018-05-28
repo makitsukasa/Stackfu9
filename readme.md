@@ -4,7 +4,7 @@ Stackfu9 interpreter in python.
 ## Stackfu9 is
 - esolang I invented
 - one-stack-oriented
-- unlimited stack size, bugnum cells
+- unlimited stack size, bignum cells
 - 9 operands
 - turing complete
   - I'll make it [ELVM](https://github.com/shinh/elvm) backend
