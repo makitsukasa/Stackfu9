@@ -3,7 +3,9 @@
 #
 # python sf9w2sf9.py input.sf9w output.sf9
 
-# StackfuckWritable has
+# Stackfu9Writable is a Stackfu9 extension.
+# It's sf9 with new sugar syntaxes.
+# sf9w has
 # - [         | jump past the matching ']' if 0
 # - ]         | jump back to the matching '['
 # - character | push immediate value
@@ -149,10 +151,11 @@ if __name__ == '__main__':
 
 	# positive or negative
 	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
-	source_string = '00="+"+"+000=%-"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
+	#source_string = '00="+"+"+000=%-"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	# 1 2 f 1 2 f 1 2 f
 	source_string = '000=""+"++"+["00=-]^[["00=-0="""++"+"++"+"+"+^"00="+-0=""+"++"+"+"+"+^00=""++-]00="""++"++""+"++"+.00="+^.]'
+	source_string = '000=""+"++"+["00=-]^[["00=-."00="+-..]^]^'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
@@ -162,4 +165,5 @@ if __name__ == '__main__':
 	print(''.join(source))
 
 	main.DEBUG_OUTPUT = False
+	#main.OUTPUT_AS_CHARACTER = True
 	main.execute(source)
