@@ -32,6 +32,16 @@ opListSF9 = [
 opListSF9W = [
 	'[',
 	']',
+	'<', # less than zero
+	'>', # greater than zero
+	'{', # less than or equal to zero
+	'}', # greater than or equal to zero
+]
+opListSF9WCompare = [
+	'<',
+	'>',
+	'{',
+	'}',
 ]
 
 # bf9 does not follow immidiate value
@@ -73,6 +83,31 @@ def resolveImmediateValue(source):
 			ans += op
 		else: # immidiate value
 			ans += opImmidiateValue(ord(op))
+	return ans
+
+# must  operands
+def opCompare(op):
+	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
+	IS_ZERO_JUMP_TO_1 = '"0=""+"++""+"++""++"+^'
+	IS_POS = '"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
+	IS_NEG = '"[00=+"0="""++""++"++"+"+^00=%00=-"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
+
+	if op is '<': # less than zero
+		return list(IS_ZERO_SKIP_ALL + IS_NEG)
+	if op is '>': # greater than zero
+		return list(IS_ZERO_SKIP_ALL + IS_POS)
+	if op is '{': # less than or equal to zero
+		return list(IS_ZERO_JUMP_TO_1 + IS_NEG)
+	if op is '}': # greater than or equal to zero
+		return list(IS_ZERO_JUMP_TO_1 + IS_POS)
+
+def resolveCompare(source):
+	ans = []
+	for op in source:
+		if op in opListSF9WCompare:
+			ans += opCompare(op)
+		else:
+			ans += op
 	return ans
 
 # @param source that resolved immidiate values, not resolved jumps
@@ -150,15 +185,18 @@ if __name__ == '__main__':
 	#source_string = '00="+""+"++["[".00=-]^00=-]^'
 
 	# positive or negative
-	source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
-	#source_string = '00="+"+"+000=%-"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
+	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
+
+	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
+	source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
 	# 1 2 f 1 2 f 1 2 f
 	#source_string = '000=""+"++"+["00=-]^[["00=-0="""++"+"++"+"+"+^"00="+-0=""+"++"+"+"+"+^00=""++-]00="""++"++""+"++"+.00="+^.]'
-	#source_string = '000=""+"++"+["00=-]^[["00=-."00="+-..]^]^'
+	#source_string = '00=[["00=-0=."00="+-0=.00=""++-]00=+]'
 
 	source = list(source_string)
 	source = resolveImmediateValue(source)
+	source = resolveCompare(source)
 	source = resolveLoop(source)
 
 	#print(source)
