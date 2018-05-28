@@ -2,6 +2,7 @@ import sys, io;
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 DEBUG_OUTPUT = True
+OUTPUT_AS_CHARACTER = False
 
 # element of the stack
 # each element contains bignum
@@ -25,9 +26,20 @@ class Element:
 		return self.n
 
 	def asCharacter(self):
-		if self.n < 32:
-			return ''
-		return chr(self.n)
+		if OUTPUT_AS_CHARACTER:
+			if self.n < 10:
+				return str(self.n)
+			elif self.n == 10:
+				return '\n'
+			elif self.n < 32:
+				return ''
+			return chr(self.n)
+		else:
+			if self.n < 10:
+				return str(self.n)
+			elif self.n < 32:
+				return ''
+			return chr(self.n)
 
 	def __eq__(self, other):
 		return self.asNumber() == other.asNumber()
@@ -37,6 +49,8 @@ class Element:
 		return Element(val);
 
 	def __str__(self):
+		if OUTPUT_AS_CHARACTER:
+			return self.asCharacter()
 		return str(self.asNumber()) + '(' + self.asCharacter() + ')'
 
 # just wrapper of array

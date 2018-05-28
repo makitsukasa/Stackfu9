@@ -17,6 +17,13 @@ ex.  3 is '00= ""++ '
 ex.  3 is '00=""++      '
     -3 is '00=""++000=%-'
 
+These values are depend on '00='.
+'00=' means 'push 1'.
+'"+' means 'multiple by 2'.
+This is useful for 'if 1 jump, if 0 not jump'.
+If stack top is 0, stack top becomes 0 after '"+"+'.
+If stack top is 1, stack top becomes 4 after '"+"+'.
+
 
 Here is how to pick arbitrary numbers.
 
