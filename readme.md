@@ -27,16 +27,16 @@ Stackfu9 interpreter in python.
 - ,  (input)  : input a character and push
 
 **jump**  
-Pop stack top and let this be n.  
+Pop the stack top and let this be n.  
 If n is positive, jump right n-th.  
 If n is negative, jump left n-th.  
 (I mean "Jump n-th", not "Jump to label".)
 
 **roll**  
-Pop stack top and let this be n.  
-Pop the stack top and insert it at the n-th of stack.
+Pop the stack top and let this be n.  
+Pop the stack top and insert it at the n-th of the stack.
 
     | a b c d e f g 4
     ↓roll
-    | a b c g d e f
-            ^ now g is 4th of stack
+    | a b g c d e f
+          ^ now g is (4 + 1)th of stack
