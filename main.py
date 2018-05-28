@@ -33,11 +33,15 @@ class Element:
 				return '\n'
 			elif self.n < 32:
 				return ''
+			elif self.n > 0x100000:
+				return ''
 			return chr(self.n)
 		else:
 			if self.n < 10:
 				return str(self.n)
 			elif self.n < 32:
+				return ''
+			elif self.n > 0x100000:
 				return ''
 			return chr(self.n)
 
