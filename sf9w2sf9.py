@@ -5,13 +5,17 @@
 
 # Stackfu9Writable is a Stackfu9 extension.
 # It's sf9 with new sugar syntaxes.
-# sf9w has
-# - [         | jump past the matching ']' if 0
-# - ]         | jump back to the matching '['
-# - character | push immediate value
+# - '[' jumps past the matching ']' if 0
+# - ']' jumps back to the matching '['
+# - '<' evaluates to 1 if the stack top is less    than             zero, and otherwise to 0
+# - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
+# - '{' evaluates to 1 if the stack top is less    than or equal to zero, and otherwise to 0
+# - '}' evaluates to 1 if the stack top is greater than or equal to zero, and otherwise to 0
+# - 'character' push immediate value
 
 import linecache
 import main
+from pick_number import pickNumber
 
 PICKNUMBER_OFFSET = 285
 PICKNUMBER_OVERHEAD = 42
@@ -37,6 +41,7 @@ opListSF9W = [
 	'{', # less than or equal to zero
 	'}', # greater than or equal to zero
 ]
+
 opListSF9WCompare = [
 	'<',
 	'>',
@@ -85,7 +90,6 @@ def resolveImmediateValue(source):
 			ans += opImmidiateValue(ord(op))
 	return ans
 
-# must 193 operands
 def opCompare(op):
 	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
 	IS_ZERO_JUMP_TO_1 = '"0=""+"++""+"++""++"+0+0+^'
@@ -101,6 +105,10 @@ def opCompare(op):
 	if op is '}': # greater than or equal to zero
 		return list(IS_ZERO_JUMP_TO_1 + IS_POS)
 
+# @param source that not resolved compares
+# @return source that resolved compares
+#
+# a compare operand is always 193 operands after parse
 def resolveCompare(source):
 	ans = []
 	for op in source:
@@ -110,8 +118,8 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
-# @param source that resolved immidiate values, not resolved jumps
-# @return source that resolved immidiate values and jumps
+# @param source that not resolved jumps
+# @return source that resolved jumps
 #
 # loop looks like 'M[N]' => 'M"0=A^NB^'
 # - 'M' decides do loop or pass, you may use M as loop counter
@@ -119,6 +127,8 @@ def resolveCompare(source):
 # - 'N' is operands in the loop
 # - 'B^' jumps to head of the loop
 # you may put '^' just after the loop to remove loop counter
+#
+# '[]' is always 92 operands after parse
 def resolveLoop(source):
 	i = 0
 	ans = []
