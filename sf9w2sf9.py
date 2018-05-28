@@ -56,8 +56,9 @@ def opImmidiateValue(val, header = True, fill = None):
 		return '0'
 
 	elif val > 0:
-		target_line = linecache.getline('pick_number.txt', val + PICKNUMBER_OFFSET)
-		target = target_line.split(' ')[-1].strip()
+		#target_line = linecache.getline('pick_number.txt', val + PICKNUMBER_OFFSET)
+		#target = target_line.split(' ')[-1].strip()
+		target = pickNumber(val)
 
 		if fill is not None:
 			while len(target) < fill:
