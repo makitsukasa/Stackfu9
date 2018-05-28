@@ -136,7 +136,7 @@ def resolveLoop(source):
 	while i < len(source):
 
 		if source[i] is ']':
-			print("error : ']' detected without '['")
+			print("error : ']' detected without '['", i)
 			return ""
 		if source[i] is not '[':
 			ans += source[i]
@@ -145,25 +145,37 @@ def resolveLoop(source):
 
 		# loop
 		ans_in_loop = []
+		hoge = i
 		i += 1		# ignore '[' once
 		while source[i] is not ']':
 			if source[i] is '[':
 				# loop is nested
 				nested_part = []
-				while source[i] is not ']':
+				nest_depth = 0
+				print("nest from", i)
+				while True:
+					if source[i] is '[':
+						print(i, "is '['")
+						nest_depth += 1
+					elif source[i] is ']':
+						print(i, "is ']'")
+						nest_depth -= 1
 					nested_part += source[i]
+					if nest_depth <= 0:
+						break
 					i += 1
-				nested_part += ']'
+
 				# now nested_part is like '[00000000]'
+				print("nested parts is", ''.join(nested_part))
 				ans_in_loop += resolveLoop(nested_part)
 			else:
 				ans_in_loop += source[i]
 
-			if i >= len(source):
-				print("error : ']' is not found after '['")
-				return ""
-
 			i += 1
+
+			if i >= len(source):
+				print("error : ']' is not found after '['", hoge)
+				return ""
 
 		# 'M[N]' => 'M"0=A^NB^'
 		# i need len(NB^) to decide A
@@ -199,20 +211,33 @@ if __name__ == '__main__':
 	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
-	source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
+	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
 	# 1 2 f 1 2 f 1 2 f
 	#source_string = '000=""+"++"+["00=-]^[["00=-0="""++"+"++"+"+"+^"00="+-0=""+"++"+"+"+"+^00=""++-]00="""++"++""+"++"+.00="+^.]'
 	#source_string = '00=[["00=-0=."00="+-0=.00=""++-]00=+]'
 
+	# fizzbuzz
+	#'''
+	source_string = \
+		'000=""+"++"+["00=-]^['\
+			'000=%"00=[0=^00=""++-"<]^00""++0=0="""++"+"++""++"+^'\
+			'00="""++"++""+"++"+."""++"++""+"++""++.00="""+"++""++"+"++"+"..'\
+			'00=%00=+00=%00=[0=^00=""+"++-"<]00=""+"++0=0="""++""++"++"+"+^'\
+			'00=""+"+"+"+"++"+.00="""++"++""+"++""++.00="""+"++""++"+"++"+"..'\
+			'00=%00=+00=%00=%0="+^".0=^00="+""+"++.'\
+		']^'
+	#'''
+
 	source = list(source_string)
 	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
+	print(''.join(source))
 	source = resolveLoop(source)
 
 	#print(source)
 	print(''.join(source))
 
-	main.DEBUG_OUTPUT = False
+	#main.DEBUG_OUTPUT = False
 	#main.OUTPUT_AS_CHARACTER = True
 	main.execute(source)
