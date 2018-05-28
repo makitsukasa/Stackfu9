@@ -50,7 +50,7 @@ opListSF9WCompare = [
 ]
 
 # bf9 does not follow immidiate value
-# read pick_number.txt to get operand that push val onto stack top
+# pickNumber() to get operand that push val onto stack top
 def opImmidiateValue(val, header = True, fill = None):
 	if val == 0:
 		return '0'
