@@ -85,10 +85,10 @@ def resolveImmediateValue(source):
 			ans += opImmidiateValue(ord(op))
 	return ans
 
-# must  operands
+# must 193 operands
 def opCompare(op):
 	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
-	IS_ZERO_JUMP_TO_1 = '"0=""+"++""+"++""++"+^'
+	IS_ZERO_JUMP_TO_1 = '"0=""+"++""+"++""++"+0+0+^'
 	IS_POS = '"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
 	IS_NEG = '"[00=+"0="""++""++"++"+"+^00=%00=-"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
 
