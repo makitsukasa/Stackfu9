@@ -136,7 +136,7 @@ def resolveLoop(source):
 	while i < len(source):
 
 		if source[i] is ']':
-			print("error : ']' detected without '['", i)
+			#print("error : ']' detected without '['", i)
 			return ""
 		if source[i] is not '[':
 			ans += source[i]
@@ -152,13 +152,13 @@ def resolveLoop(source):
 				# loop is nested
 				nested_part = []
 				nest_depth = 0
-				print("nest from", i)
+				#print("nest from", i)
 				while True:
 					if source[i] is '[':
-						print(i, "is '['")
+						#print(i, "is '['")
 						nest_depth += 1
 					elif source[i] is ']':
-						print(i, "is ']'")
+						#print(i, "is ']'")
 						nest_depth -= 1
 					nested_part += source[i]
 					if nest_depth <= 0:
@@ -166,7 +166,7 @@ def resolveLoop(source):
 					i += 1
 
 				# now nested_part is like '[00000000]'
-				print("nested parts is", ''.join(nested_part))
+				#print("nested parts is", ''.join(nested_part))
 				ans_in_loop += resolveLoop(nested_part)
 			else:
 				ans_in_loop += source[i]
@@ -174,7 +174,7 @@ def resolveLoop(source):
 			i += 1
 
 			if i >= len(source):
-				print("error : ']' is not found after '['", hoge)
+				#print("error : ']' is not found after '['", hoge)
 				return ""
 
 		# 'M[N]' => 'M"0=A^NB^'
@@ -214,7 +214,7 @@ if __name__ == '__main__':
 	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
 	# fizzbuzz
-	'''
+	#'''
 	source_string = \
 		'000=""+"++""++"+"+["00=-]^[000=%'\
 			'"00=[0=^00=""++-">]^0=0="""++"+"++""++"+^'\
@@ -223,18 +223,18 @@ if __name__ == '__main__':
 			'00=""+"+"+"+"++"+.00="""++"+"++""++""++.00="""+"++""++"+"++"+"..00=%00=+00=%'\
 			'00=%0=0="+^".0=^00="+""+"++.'\
 		']^'
-	'''
+	#'''
 
-	print(source_string)
+	#print(source_string)
 	source = list(source_string)
 	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
-	print(''.join(source))
+	#print(''.join(source))
 	source = resolveLoop(source)
 
 	#print(source)
 	print(''.join(source))
 
 	main.DEBUG_OUTPUT = False
-	main.OUTPUT_AS_CHARACTER = True
+	#main.OUTPUT_AS_CHARACTER = True
 	main.execute(source)
