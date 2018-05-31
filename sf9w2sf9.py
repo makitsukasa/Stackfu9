@@ -14,7 +14,8 @@
 # - 'character' push immediate value
 
 import linecache
-import main
+import sys
+#import main
 from pick_number import pickNumber
 
 PICKNUMBER_OFFSET = 285
@@ -225,6 +226,9 @@ if __name__ == '__main__':
 		']^'
 	#'''
 
+	if len(sys.argv) > 1:
+		source_string = open(sys.argv[1]).read()
+
 	#print(source_string)
 	source = list(source_string)
 	source = resolveImmediateValue(source)
@@ -233,8 +237,11 @@ if __name__ == '__main__':
 	source = resolveLoop(source)
 
 	#print(source)
-	print(''.join(source))
+	#print(''.join(source))
 
-	main.DEBUG_OUTPUT = False
+	if len(sys.argv) > 2:
+		open(sys.argv[2], 'w').write(''.join(source))
+
+	#main.DEBUG_OUTPUT = False
 	#main.OUTPUT_AS_CHARACTER = True
-	main.execute(source)
+	#main.execute(source)
