@@ -5,8 +5,8 @@
 
 # Stackfu9Writable is a Stackfu9 extension.
 # It's sf9 with new sugar syntaxes.
-# - '[' jumps past the matching ']' if 0
-# - ']' jumps back to the matching '['
+# - '!LABEL_NAME!' jumps to label if non-zero
+# - ':LABEL_NAME:' defines label
 # - '<' evaluates to 1 if the stack top is less    than             zero, and otherwise to 0
 # - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
 # - '{' evaluates to 1 if the stack top is less    than or equal to zero, and otherwise to 0
@@ -35,8 +35,8 @@ opListSF9 = [
 ]
 
 opListSF9W = [
-	'[',
-	']',
+	'!',
+	':',
 	'<', # less than zero
 	'>', # greater than zero
 	'{', # less than or equal to zero
@@ -120,82 +120,29 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
-# @param source that not resolved jumps
-# @return source that resolved jumps
-#
-# loop looks like 'M[N]' => 'M"0=A^NB^'
-# - 'M' decides do loop or pass, you may use M as loop counter
-# - 'A^' jumps to tail of the loop
-# - 'N' is operands in the loop
-# - 'B^' jumps to head of the loop
-# you may put '^' just after the loop to remove loop counter
-#
-# '[]' is always 92 operands after parse
-def resolveLoop(source):
-	i = 0
-	ans = []
-	while i < len(source):
+def resolveOneJump(source):
+	pass
 
-		if source[i] is ']':
-			#print("error : ']' detected without '['", i)
-			return ""
-		if source[i] is not '[':
-			ans += source[i]
-			i += 1
-			continue
+# _:B:_!A!_!B!_:A:_ => _a^_b^_
+def resolveOneJumpImpossibleToResolve(source):
+	pass
 
-		# loop
-		ans_in_loop = []
-		hoge = i
-		i += 1		# ignore '[' once
-		while source[i] is not ']':
-			if source[i] is '[':
-				# loop is nested
-				nested_part = []
-				nest_depth = 0
-				#print("nest from", i)
-				while True:
-					if source[i] is '[':
-						#print(i, "is '['")
-						nest_depth += 1
-					elif source[i] is ']':
-						#print(i, "is ']'")
-						nest_depth -= 1
-					nested_part += source[i]
-					if nest_depth <= 0:
-						break
-					i += 1
+# i can not resolve nested jump like _:B:_!A!_!B!_:A:_
+# special treatment needed
+def resolveJump(source):
+	before = source
+	after = ''
+	while before != after:
+		# resolve jump as  as possible
+		while before != after:
+			after = resolveOneJump(before)
+			before = after
 
-				# now nested_part is like '[00000000]'
-				#print("nested parts is", ''.join(nested_part))
-				ans_in_loop += resolveLoop(nested_part)
-			else:
-				ans_in_loop += source[i]
+		# now there are no jump except _:B:_!A!_!B!_:A:_
+		# special treatment
+		after = resolveOneJumpImpossibleToResolve(before)
 
-			i += 1
-
-			if i >= len(source):
-				#print("error : ']' is not found after '['", hoge)
-				return ""
-
-		# 'M[N]' => 'M"0=A^NB^'
-		# i need len(NB^) to decide A
-		# i need len("0=A^NB^) to decide B
-		# for this problem, i decide both len(A) and len(B) is PICKNUMBER_OVERHEAD
-		# but it is not best way
-		ans += '"0='
-		num = len(ans_in_loop) + PICKNUMBER_OVERHEAD_WITH_HEADER + 1
-		ans += list(opImmidiateValue(num,
-				header = False, fill = PICKNUMBER_OVERHEAD))
-		ans += '^'
-		ans += ans_in_loop
-		num = -(len(ans_in_loop) + PICKNUMBER_OVERHEAD_WITH_HEADER + PICKNUMBER_OVERHEAD + 5)
-		ans += list(opImmidiateValue(num,
-				header = True, fill = PICKNUMBER_OVERHEAD))
-		ans += '^'
-		i += 1
-
-	return ans
+	return after
 
 if __name__ == '__main__':
 	# print Hello World!
@@ -214,8 +161,11 @@ if __name__ == '__main__':
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
 	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
+	# single loop
+	source_string = '00="+""+"++:A:00=-".!A!'
+
 	# fizzbuzz
-	#'''
+	'''
 	source_string = \
 		'000=""+"++""++"+"+["00=-]^[000=%'\
 			'"00=[0=^00=""++-">]^0=0="""++"+"++""++"+^'\
@@ -224,7 +174,7 @@ if __name__ == '__main__':
 			'00=""+"+"+"+"++"+.00="""++"+"++""++""++.00="""+"++""++"+"++"+"..00=%00=+00=%'\
 			'00=%0=0="+^".0=^00="+""+"++.'\
 		']^'
-	#'''
+	'''
 
 	if len(sys.argv) > 1:
 		source_string = open(sys.argv[1]).read()
@@ -234,7 +184,7 @@ if __name__ == '__main__':
 	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
 	#print(''.join(source))
-	source = resolveLoop(source)
+	source = resolveJump(source)
 
 	#print(source)
 	#print(''.join(source))
