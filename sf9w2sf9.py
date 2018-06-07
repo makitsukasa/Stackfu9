@@ -15,6 +15,7 @@
 
 import linecache
 import sys
+import re
 #import main
 from pick_number import pickNumber
 
@@ -107,6 +108,13 @@ def opCompare(op):
 	if op is '}': # greater than or equal to zero
 		return list(IS_ZERO_JUMP_TO_1 + IS_POS)
 
+def get_source_length(source):
+	if '!' in source:
+		return None
+
+	source_without_label_list = re.split(':[^:]+:', source)
+	return len(''.join(source_without_label_list))
+
 # @param source that not resolved compares
 # @return source that resolved compares
 #
@@ -120,10 +128,33 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
-# _!A!_:A:_ => _a^__
+# __p__!A!__q__:A:__r__ => __p__a^__q__:A:__r__
 # easiest
 def resolveOneJumpForward(source):
-	pass
+	source = '..1..!H!..2..:H:..3..'
+
+	if type(source) == list:
+		source_string = ''.join(source)
+	elif type(source) == str:
+		source_string = source
+		source = list(source)
+
+	source_splitted = source_string.split('!', 2)
+	if len(source_splitted) < 3:
+		return source
+	p, tag_name, q_tag_r = source_splitted
+
+	q_tag_r_splitted = q_tag_r.split(':' + tag_name + ':', 1)
+	if len(q_tag_r_splitted) < 2:
+		return source
+	q, r = q_tag_r_splitted
+
+	length = get_source_length(q)
+	if length is None:
+		return source
+
+	ans = p + opImmidiateValue(length, header = True) + '^' +\
+			q + ':' + tag_name + ':' + r
 
 # _:B:_!B!_ => __b^_
 # use len(b) to determine b
@@ -187,6 +218,9 @@ if __name__ == '__main__':
 			'00=%0=0="+^".0=^00="+""+"++.'\
 		']^'
 	'''
+
+	print(resolveOneJumpForward(source_string))
+	exit(0)
 
 	if len(sys.argv) > 1:
 		source_string = open(sys.argv[1]).read()
