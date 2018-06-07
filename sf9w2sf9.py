@@ -120,29 +120,41 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
-def resolveOneJump(source):
+# _!A!_:A:_ => _a^__
+# easiest
+def resolveOneJumpForward(source):
 	pass
 
-# _:B:_!A!_!B!_:A:_ => _a^_b^_
-def resolveOneJumpImpossibleToResolve(source):
+# _:B:_!B!_ => __b^_
+# use len(b) to determine b
+def resolveOneJumpBackward(source):
 	pass
 
-# i can not resolve nested jump like _:B:_!A!_!B!_:A:_
-# special treatment needed
+# _:B:_!A!_!B!_:A:_ => __a^_b^__
+# use len(a)+len(b) to determine b,
+# use len(b) to determine a
+def resolveOneJumpNested(source):
+	pass
+
+# labels are no longer needed
+def eraseLabels(source):
+	pass
+
 def resolveJump(source):
 	before = source
 	after = ''
 	while before != after:
-		# resolve jump as  as possible
 		while before != after:
-			after = resolveOneJump(before)
 			before = after
+			after = resolveOneJumpForward(before)
+			before = after
+			after = resolveOneJumpBackward(before)
 
 		# now there are no jump except _:B:_!A!_!B!_:A:_
-		# special treatment
-		after = resolveOneJumpImpossibleToResolve(before)
+		# special treatment needed
+		after = resolveOneJumpNested(before)
 
-	return after
+	return eraseLabels(after)
 
 if __name__ == '__main__':
 	# print Hello World!
