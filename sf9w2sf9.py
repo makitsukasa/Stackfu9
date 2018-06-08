@@ -5,7 +5,7 @@
 
 # Stackfu9Writable is a Stackfu9 extension.
 # It's sf9 with new sugar syntaxes.
-# - '!LABEL_NAME!' jumps to label if non-zero
+# - '!LABEL_NAME!' jumps to label if zero
 # - ':LABEL_NAME:' defines label
 # - '<' evaluates to 1 if the stack top is less    than             zero, and otherwise to 0
 # - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
@@ -16,7 +16,7 @@
 import linecache
 import sys
 import re
-#import main
+import main
 from pick_number import pickNumber
 
 PICKNUMBER_OFFSET = 285
@@ -80,6 +80,22 @@ def opImmidiateValue(val, header = True, fill = None):
 
 		return target
 
+# __p__:B:__q__!B!__r__ => __p__:B:__q__b^__r__
+# @param val is len(q)
+# @return b
+def opImmidiateValueBack(val):
+	b = val
+	op_b = opImmidiateValue(-val, header = False)
+	len_b = len(op_b)
+	while b < len_b + val:
+		b += 2
+		op_b = opImmidiateValue(-b, header = False)
+		len_b = len(op_b)
+
+	op_b = opImmidiateValue(-b, header = False, fill = b - len_b)
+	#print(b)
+	return op_b
+
 # @param source that not resolved immidiate values
 # @return source that resolved immidiate values
 def resolveImmediateValue(source):
@@ -128,11 +144,10 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
-# __p__!A!__q__:A:__r__ => __p__a^__q__:A:__r__
+# __p__!F!__q__:F:__r__ => __p__0=f^__q__:F:__r__
 # easiest
 def resolveOneJumpForward(source):
-	source = '..1..!H!..2..:H:..3..'
-
+	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
 	elif type(source) == str:
@@ -153,39 +168,73 @@ def resolveOneJumpForward(source):
 	if length is None:
 		return source
 
-	ans = p + opImmidiateValue(length, header = True) + '^' +\
+	ans = p + '0=' + opImmidiateValue(length, header = False) + '^' +\
 			q + ':' + tag_name + ':' + r
 
-# _:B:_!B!_ => __b^_
+	return list(ans)
+
+# __p__:B:__q__!B!__r__ => __p__:B:__q__0=b^__r__
 # use len(b) to determine b
 def resolveOneJumpBackward(source):
-	pass
+	source_string = ''
+	if type(source) == list:
+		source_string = ''.join(source)
+	elif type(source) == str:
+		source_string = source
+		source = list(source)
 
-# _:B:_!A!_!B!_:A:_ => __a^_b^__
-# use len(a)+len(b) to determine b,
-# use len(b) to determine a
+	source_splitted = source_string.split('!', 2)
+	if len(source_splitted) < 3:
+		return source
+	p_tag_q, tag_name, r = source_splitted
+
+	p_tag_q_splitted = p_tag_q.rsplit(':' + tag_name + ':', 1)
+	if len(p_tag_q_splitted) < 2:
+		return source
+	p, q = p_tag_q_splitted
+
+	len_q = get_source_length(q)
+	if len_q is None:
+		return source
+
+	ans = p + ':' + tag_name + ':' + q +\
+			'0=' + opImmidiateValueBack(len_q + 3) + '^' + r
+
+	return list(ans)
+
+# _:B:_!F!_!B!_:F:_ => __f^_b^__
+# use len(f)+len(b) to determine b,
+# use len(b) to determine f
 def resolveOneJumpNested(source):
-	pass
+	return source
 
 # labels are no longer needed
-def eraseLabels(source):
-	pass
+def removeLabels(source):
+	#print(source)
+	return ''.join(re.split(':[^:]+:', ''.join(source)))
 
 def resolveJump(source):
 	before = source
-	after = ''
-	while before != after:
-		while before != after:
+	after = source
+	while True:
+		while True:
 			before = after
 			after = resolveOneJumpForward(before)
+			if before == after:
+				break
+		while True:
 			before = after
 			after = resolveOneJumpBackward(before)
+			if before == after:
+				break
 
 		# now there are no jump except _:B:_!A!_!B!_:A:_
 		# special treatment needed
 		after = resolveOneJumpNested(before)
+		if before == after:
+			break
 
-	return eraseLabels(after)
+	return removeLabels(after)
 
 if __name__ == '__main__':
 	# print Hello World!
@@ -204,8 +253,11 @@ if __name__ == '__main__':
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
 	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
+	# branch zero or non-zero
+	source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
+
 	# single loop
-	source_string = '00="+""+"++:A:00=-".!A!'
+	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
 
 	# fizzbuzz
 	'''
@@ -219,7 +271,10 @@ if __name__ == '__main__':
 		']^'
 	'''
 
-	print(resolveOneJumpForward(source_string))
+	hoge = resolveJump(source_string)
+	print(hoge)
+	#main.DEBUG_OUTPUT = True
+	main.execute(hoge)
 	exit(0)
 
 	if len(sys.argv) > 1:
