@@ -130,7 +130,7 @@ def resolveCompare(source):
 
 # __p__!F!__q__:F:__r__ => __p__0=f^__q__:F:__r__
 # easiest
-def resolveOneJumpForward(source, index = 0):
+def resolveJumpOnceForward(source, index = 0):
 	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
@@ -148,12 +148,12 @@ def resolveOneJumpForward(source, index = 0):
 
 	q_label_r_splitted = q_label_r.split(':' + label_name + ':', 1)
 	if len(q_label_r_splitted) < 2:
-		return resolveOneJumpForward(source, index + 1)
+		return resolveJumpOnceForward(source, index + 1)
 	q, r = q_label_r_splitted
 
 	len_q = get_source_length(q)
 	if len_q is None:
-		return resolveOneJumpForward(source, index + 1)
+		return resolveJumpOnceForward(source, index + 1)
 
 	ans = p + '0=' + opImmidiateValue(len_q, header = False) + '^' +\
 			q + ':' + label_name + ':' + r
@@ -172,13 +172,13 @@ def opImmidiateValueBackward(val):
 		op_b = opImmidiateValue(-b, header = False)
 		len_b = len(op_b)
 
-	op_b = opImmidiateValue(-b, header = False, fill = b - len_b)
+	op_b = opImmidiateValue(-b, header = False, fill = b - val)
 	#print(b)
 	return op_b
 
 # __p__:B:__q__!B!__r__ => __p__:B:__q__0=b^__r__
 # use len(b) to determine b
-def resolveOneJumpBackward(source, index = 0):
+def resolveJumpOnceBackward(source, index = 0):
 	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
@@ -197,12 +197,12 @@ def resolveOneJumpBackward(source, index = 0):
 
 	p_label_q_splitted = p_label_q.rsplit(':' + label_name + ':', 1)
 	if len(p_label_q_splitted) < 2:
-		return resolveOneJumpBackward(source, index + 1)
+		return resolveJumpOnceBackward(source, index + 1)
 	p, q = p_label_q_splitted
 
 	len_q = get_source_length(q)
 	if len_q is None:
-		return resolveOneJumpBackward(source, index + 1)
+		return resolveJumpOnceBackward(source, index + 1)
 
 	ans = p + ':' + label_name + ':' + q +\
 			'0=' + opImmidiateValueBackward(len_q + 3) + '^' + r
@@ -227,16 +227,16 @@ def opImmidiateValueNested(overhead_f, overhead_b):
 		op_b = opImmidiateValue(-b, header = False)
 		len_b = len(op_b)
 
-	op_b = opImmidiateValue(-b, header = False, fill = len_b - b - len_f)
+	#print(b, (len_b + len_f + overhead_b))
+	op_b = opImmidiateValue(-b, header = False, fill = b - (len_f + overhead_b))
 
-	print("f is", overhead_f + len_b, ", b is", b)
-
+	#print("f is", overhead_f + len_b, ", b is", b)
 	return op_f, op_b
 
 # __p__:B:__q__!F!__r__!B!__s__:F:__t__ => __p__:B:__q__0=f^__r__0=b^__s__:F:__t__
 # use len(f) + len(b) to determine b
 # use len(b) to determine f
-def resolveOneJumpNested(source):
+def resolveJumpOnceNested(source, index = 0):
 	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
@@ -244,33 +244,37 @@ def resolveOneJumpNested(source):
 		source_string = source
 		source = list(source)
 
+	source_string = source_string.replace('!', '❣', index * 2)
 	source_splitted = source_string.split('!', 4)
 	if len(source_splitted) < 5:
 		return source
 	p_labelB_q, labelF_name, r, labelB_name, s_labelF_t = source_splitted
+	source_string = source_string.replace('❣', '!')
+	p_labelB_q = p_labelB_q.replace('❣', '!')
+	r = r.replace('❣', '!')
 
 	p_labelB_q_splitted = p_labelB_q.rsplit(':' + labelB_name + ':', 1)
 	if len(p_labelB_q_splitted) < 2:
-		return source
+		return resolveJumpOnceNested(source, index + 1)
 	p, q = p_labelB_q_splitted
 
-	s_labelF_t_splitted = s_labelF_t.rsplit(':' + labelF_name + ':', 1)
+	s_labelF_t_splitted = s_labelF_t.split(':' + labelF_name + ':', 1)
 	if len(s_labelF_t_splitted) < 2:
-		return source
+		return resolveJumpOnceNested(source, index + 1)
 	s, t = s_labelF_t_splitted
 
 	len_q = get_source_length(q)
 	len_r = get_source_length(r)
 	len_s = get_source_length(s)
 	if len_q is None or len_r is None or len_s is None:
-		return source
+		return resolveJumpOnceNested(source, index + 1)
 
 	op_f, op_b = opImmidiateValueNested(len_r + len_s + 3, len_q + len_r + 6)
 
-	ans = 	p + ':' + labelB_name + ':' + q +\
-			'0=' + op_f + '^' + r +\
-			'0=' + op_b + '^' +\
-			s + ':' + labelF_name + ':' + t
+	ans = p + ':' + labelB_name + ':' + q +\
+	      '0=' + op_f + '^' + r +\
+	      '0=' + op_b + '^' +\
+	      s + ':' + labelF_name + ':' + t
 
 	return list(ans)
 
@@ -285,18 +289,18 @@ def resolveJump(source):
 	while True:
 		while True:
 			before = after
-			after = resolveOneJumpForward(before)
+			after = resolveJumpOnceForward(before)
 			if before == after:
 				break
 		while True:
 			before = after
-			after = resolveOneJumpBackward(before)
+			after = resolveJumpOnceBackward(before)
 			if before == after:
 				break
 
 		# now there are no jump except _:B:_!A!_!B!_:A:_
 		# special treatment needed
-		after = resolveOneJumpNested(before)
+		after = resolveJumpOnceNested(before)
 		if before == after:
 			break
 
@@ -327,6 +331,9 @@ if __name__ == '__main__':
 
 	# nested jump
 	source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
+
+	# nested nested jump
+	source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
 
 	# fizzbuzz
 	'''
