@@ -157,19 +157,19 @@ def resolveOneJumpForward(source):
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
-	p, tag_name, q_tag_r = source_splitted
+	p, label_name, q_label_r = source_splitted
 
-	q_tag_r_splitted = q_tag_r.split(':' + tag_name + ':', 1)
-	if len(q_tag_r_splitted) < 2:
+	q_label_r_splitted = q_label_r.split(':' + label_name + ':', 1)
+	if len(q_label_r_splitted) < 2:
 		return source
-	q, r = q_tag_r_splitted
+	q, r = q_label_r_splitted
 
 	length = get_source_length(q)
 	if length is None:
 		return source
 
 	ans = p + '0=' + opImmidiateValue(length, header = False) + '^' +\
-			q + ':' + tag_name + ':' + r
+			q + ':' + label_name + ':' + r
 
 	return list(ans)
 
@@ -186,27 +186,65 @@ def resolveOneJumpBackward(source):
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
-	p_tag_q, tag_name, r = source_splitted
+	p_label_q, label_name, r = source_splitted
 
-	p_tag_q_splitted = p_tag_q.rsplit(':' + tag_name + ':', 1)
-	if len(p_tag_q_splitted) < 2:
+	p_label_q_splitted = p_label_q.rsplit(':' + label_name + ':', 1)
+	if len(p_label_q_splitted) < 2:
 		return source
-	p, q = p_tag_q_splitted
+	p, q = p_label_q_splitted
 
 	len_q = get_source_length(q)
 	if len_q is None:
 		return source
 
-	ans = p + ':' + tag_name + ':' + q +\
+	ans = p + ':' + label_name + ':' + q +\
 			'0=' + opImmidiateValueBack(len_q + 3) + '^' + r
 
 	return list(ans)
 
-# _:B:_!F!_!B!_:F:_ => __f^_b^__
-# use len(f)+len(b) to determine b,
+# __p__:B:__q__!F!__r__!B!__s__:F:__t__ => __p__:B:__q__0=f^__r__0=b^__s__:F:__t__
+# use len(f) + len(b) to determine b
 # use len(b) to determine f
 def resolveOneJumpNested(source):
-	return source
+	source_string = ''
+	if type(source) == list:
+		source_string = ''.join(source)
+	elif type(source) == str:
+		source_string = source
+		source = list(source)
+
+	source_splitted = source_string.split('!', 4)
+	if len(source_splitted) < 5:
+		return source
+	p_labelB_q, labelF_name, r, labelB_name, s_labelF_t = source_splitted
+
+	p_labelB_q_splitted = p_labelB_q.rsplit(':' + labelB_name + ':', 1)
+	if len(p_labelB_q_splitted) < 2:
+		return source
+	p, q = p_labelB_q_splitted
+
+	s_labelF_t_splitted = s_labelF_t.rsplit(':' + labelF_name + ':', 1)
+	if len(s_labelF_t_splitted) < 2:
+		return source
+	s, t = s_label_t_splitted
+
+	len_q = get_source_length(q)
+	len_r = get_source_length(r)
+	len_s = get_source_length(s)
+	if len_q is None or len_r is None or len_s is None:
+		return source
+
+	opF = '"+"+"+'
+	opB = '"+"+"+'
+
+	ans = p + ':' + labelB_name + ':' + q +\
+			'0=' + opF + '^' +\
+			r +\
+			'0=' + opB + '^' +\
+			s + ':' + labelF_name + ':' + t
+
+	return list(ans)
+
 
 # labels are no longer needed
 def removeLabels(source):
@@ -254,7 +292,7 @@ if __name__ == '__main__':
 	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
 	# branch zero or non-zero
-	source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
+	source_string = '00="+"+"+""!A1!.00=.:A0:0=!A2!.0.:A2:'
 
 	# single loop
 	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
