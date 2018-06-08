@@ -11,17 +11,13 @@
 # - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
 # - '{' evaluates to 1 if the stack top is less    than or equal to zero, and otherwise to 0
 # - '}' evaluates to 1 if the stack top is greater than or equal to zero, and otherwise to 0
-# - 'character' push immediate value without 10083 0x2763 ❣
+# - 'character' push immediate value up to 126975 \u1efff
 
 import linecache
 import sys
 import re
 import main
 from pick_number import pickNumber
-
-PICKNUMBER_OFFSET = 285
-PICKNUMBER_OVERHEAD = 42
-PICKNUMBER_OVERHEAD_WITH_HEADER = PICKNUMBER_OVERHEAD + 3
 
 opListSF9 = [
 	'0',
@@ -38,6 +34,8 @@ opListSF9 = [
 opListSF9W = [
 	'!',
 	':',
+	'[',
+	']',
 	'<', # less than zero
 	'>', # greater than zero
 	'{', # less than or equal to zero
@@ -58,36 +56,32 @@ def opImmidiateValue(val, header = True, fill = None):
 		return '0'
 
 	elif val > 0:
-		#target_line = linecache.getline('pick_number.txt', val + PICKNUMBER_OFFSET)
-		#target = target_line.split(' ')[-1].strip()
-		target = pickNumber(val)
+		op = pickNumber(val)
 
 		if fill is not None:
-			while len(target) < fill:
-				target += '0+'
+			while len(op) < fill:
+				op += '0+'
 
 		if header:
-			target = '00=' + target
+			op = '00=' + op
 
-		return target
+		return op
 
 	else:
 		fill = None if fill is None else fill - 2
-		target = '"' + opImmidiateValue(-val + 1, header = False, fill = fill) + '-'
+		op = '"' + opImmidiateValue(-val + 1, header = False, fill = fill) + '-'
 
 		if header:
-			target = '00=' + target
+			op = '00=' + op
 
-		return target
+		return op
 
 # @param source that not resolved immidiate values
 # @return source that resolved immidiate values
 def resolveImmediateValue(source):
 	ans = []
 	for op in source:
-		if op in opListSF9:
-			ans += op
-		elif op in opListSF9W:
+		if op in opListSF9 or op in opListSF9W:
 			ans += op
 		else: # immidiate value
 			ans += opImmidiateValue(ord(op))
@@ -128,23 +122,80 @@ def resolveCompare(source):
 			ans += op
 	return ans
 
+# '__M__[__N__]' => '__M__:B:"0=!F!__N__00=!B!:F:'
+def resolveLoop(source, offset = 0):
+	i = 0
+	ans = []
+	while i < len(source):
+
+		if source[i] is ']':
+			print("error : ']' detected without '['", i)
+			return ""
+		if source[i] is not '[':
+			ans += source[i]
+			i += 1
+			continue
+
+		# loop
+		ans_in_loop = []
+		loop_start_pos = i + offset
+		i += 1		# ignore '[' once
+		while source[i] is not ']':
+			if source[i] is '[':
+				# loop is nested
+				nested_part = []
+				nest_depth = 0
+				#print("nest from", i)
+				while True:
+					if source[i] is '[':
+						#print(i, "is '['")
+						nest_depth += 1
+					elif source[i] is ']':
+						#print(i, "is ']'")
+						nest_depth -= 1
+					nested_part += source[i]
+					if nest_depth <= 0:
+						break
+					i += 1
+
+				# now nested_part is like '[00000000]'
+				#print("nested parts is", ''.join(nested_part))
+				ans_in_loop += resolveLoop(nested_part, i)
+			else:
+				ans_in_loop += source[i]
+
+			i += 1
+
+			if i >= len(source):
+				print("error : ']' is not found after '['", loop_start_pos)
+				return ""
+
+		# '__M__[__N__]' => '__M__:B:"0=!F!__N__00=!B!:F:'
+		tagB_name = '📜B' + str(loop_start_pos)
+		tagF_name = '📜F' + str(loop_start_pos)
+		ans += ':' + tagB_name + ':' +\
+		       '"' +\
+		       '!' + tagF_name + '!' +\
+		       ''.join(ans_in_loop) +\
+		       '0!' + tagB_name + '!' +\
+		       ':' + tagF_name + ':'
+
+		i += 1
+
+	return ans
+
 # __p__!F!__q__:F:__r__ => __p__0=f^__q__:F:__r__
 # easiest
 def resolveJumpOnceForward(source, index = 0):
-	source_string = ''
-	if type(source) == list:
-		source_string = ''.join(source)
-	elif type(source) == str:
-		source_string = source
-		source = list(source)
+	source_string = ''.join(source)
 
-	source_string = source_string.replace('!', '❣', index * 2)
+	source_string = source_string.replace('!', '📍', index * 2)
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
 	p, label_name, q_label_r = source_splitted
-	source_string = source_string.replace('❣', '!')
-	p = p.replace('❣', '!')
+	source_string = source_string.replace('📍', '!')
+	p = p.replace('📍', '!')
 
 	q_label_r_splitted = q_label_r.split(':' + label_name + ':', 1)
 	if len(q_label_r_splitted) < 2:
@@ -179,21 +230,16 @@ def opImmidiateValueBackward(val):
 # __p__:B:__q__!B!__r__ => __p__:B:__q__0=b^__r__
 # use len(b) to determine b
 def resolveJumpOnceBackward(source, index = 0):
-	source_string = ''
-	if type(source) == list:
-		source_string = ''.join(source)
-	elif type(source) == str:
-		source_string = source
-		source = list(source)
+	source_string = ''.join(source)
 
-	source_string = source_string.replace('!', '❣', index * 2)
+	source_string = source_string.replace('!', '📍', index * 2)
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
 	p_label_q, label_name, r = source_splitted
-	source_string = source_string.replace('❣', '!')
-	p_label_q = p_label_q.replace('❣', '!')
-	r = r.replace('❣', '!')
+	source_string = source_string.replace('📍', '!')
+	p_label_q = p_label_q.replace('📍', '!')
+	r = r.replace('📍', '!')
 
 	p_label_q_splitted = p_label_q.rsplit(':' + label_name + ':', 1)
 	if len(p_label_q_splitted) < 2:
@@ -237,21 +283,16 @@ def opImmidiateValueNested(overhead_f, overhead_b):
 # use len(f) + len(b) to determine b
 # use len(b) to determine f
 def resolveJumpOnceNested(source, index = 0):
-	source_string = ''
-	if type(source) == list:
-		source_string = ''.join(source)
-	elif type(source) == str:
-		source_string = source
-		source = list(source)
+	source_string = ''.join(source)
 
-	source_string = source_string.replace('!', '❣', index * 2)
+	source_string = source_string.replace('!', '📍', index * 2)
 	source_splitted = source_string.split('!', 4)
 	if len(source_splitted) < 5:
 		return source
 	p_labelB_q, labelF_name, r, labelB_name, s_labelF_t = source_splitted
-	source_string = source_string.replace('❣', '!')
-	p_labelB_q = p_labelB_q.replace('❣', '!')
-	r = r.replace('❣', '!')
+	source_string = source_string.replace('📍', '!')
+	p_labelB_q = p_labelB_q.replace('📍', '!')
+	r = r.replace('📍', '!')
 
 	p_labelB_q_splitted = p_labelB_q.rsplit(':' + labelB_name + ':', 1)
 	if len(p_labelB_q_splitted) < 2:
@@ -347,28 +388,23 @@ if __name__ == '__main__':
 		']^'
 	'''
 
-	hoge = resolveJump(source_string)
-	print(hoge)
-	#main.DEBUG_OUTPUT = True
-	main.execute(hoge)
-	exit(0)
-
 	if len(sys.argv) > 1:
 		source_string = open(sys.argv[1]).read()
 
-	#print(source_string)
+	print(source_string)
 	source = list(source_string)
 	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
-	#print(''.join(source))
+	source = resolveLoop(source)
+	print(''.join(source))
 	source = resolveJump(source)
 
 	#print(source)
-	#print(''.join(source))
+	print(''.join(source))
 
 	if len(sys.argv) > 2:
 		open(sys.argv[2], 'w').write(''.join(source))
 
-	#main.DEBUG_OUTPUT = False
+	#main.DEBUG_OUTPUT = True
 	#main.OUTPUT_AS_CHARACTER = True
-	#main.execute(source)
+	main.execute(source)
