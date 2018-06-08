@@ -11,7 +11,7 @@
 # - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
 # - '{' evaluates to 1 if the stack top is less    than or equal to zero, and otherwise to 0
 # - '}' evaluates to 1 if the stack top is greater than or equal to zero, and otherwise to 0
-# - 'character' push immediate value
+# - 'character' push immediate value without 10083 0x2763 ❣
 
 import linecache
 import sys
@@ -146,7 +146,7 @@ def resolveCompare(source):
 
 # __p__!F!__q__:F:__r__ => __p__0=f^__q__:F:__r__
 # easiest
-def resolveOneJumpForward(source):
+def resolveOneJumpForward(source, index = 0):
 	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
@@ -154,28 +154,31 @@ def resolveOneJumpForward(source):
 		source_string = source
 		source = list(source)
 
+	source_string = source_string.replace('!', '❣', index * 2)
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
 	p, label_name, q_label_r = source_splitted
+	source_string = source_string.replace('❣', '!')
+	p = p.replace('❣', '!')
 
 	q_label_r_splitted = q_label_r.split(':' + label_name + ':', 1)
 	if len(q_label_r_splitted) < 2:
-		return source
+		return resolveOneJumpForward(source, index + 1)
 	q, r = q_label_r_splitted
 
-	length = get_source_length(q)
-	if length is None:
-		return source
+	len_q = get_source_length(q)
+	if len_q is None:
+		return resolveOneJumpForward(source, index + 1)
 
-	ans = p + '0=' + opImmidiateValue(length, header = False) + '^' +\
+	ans = p + '0=' + opImmidiateValue(len_q, header = False) + '^' +\
 			q + ':' + label_name + ':' + r
 
 	return list(ans)
 
 # __p__:B:__q__!B!__r__ => __p__:B:__q__0=b^__r__
 # use len(b) to determine b
-def resolveOneJumpBackward(source):
+def resolveOneJumpBackward(source, index = 0):
 	source_string = ''
 	if type(source) == list:
 		source_string = ''.join(source)
@@ -183,19 +186,22 @@ def resolveOneJumpBackward(source):
 		source_string = source
 		source = list(source)
 
+	source_string = source_string.replace('!', '❣', index * 2)
 	source_splitted = source_string.split('!', 2)
 	if len(source_splitted) < 3:
 		return source
 	p_label_q, label_name, r = source_splitted
+	source_string = source_string.replace('❣', '!')
+	p = p.replace('❣', '!')
 
 	p_label_q_splitted = p_label_q.rsplit(':' + label_name + ':', 1)
 	if len(p_label_q_splitted) < 2:
-		return source
+		return resolveOneJumpBackward(source, index + 1)
 	p, q = p_label_q_splitted
 
 	len_q = get_source_length(q)
 	if len_q is None:
-		return source
+		return resolveOneJumpBackward(source, index + 1)
 
 	ans = p + ':' + label_name + ':' + q +\
 			'0=' + opImmidiateValueBack(len_q + 3) + '^' + r
@@ -292,7 +298,7 @@ if __name__ == '__main__':
 	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
 
 	# branch zero or non-zero
-	source_string = '00="+"+"+""!A1!.00=.:A0:0=!A2!.0.:A2:'
+	source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
 
 	# single loop
 	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
