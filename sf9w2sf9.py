@@ -80,22 +80,6 @@ def opImmidiateValue(val, header = True, fill = None):
 
 		return target
 
-# __p__:B:__q__!B!__r__ => __p__:B:__q__b^__r__
-# @param val is len(q)
-# @return b
-def opImmidiateValueBack(val):
-	b = val
-	op_b = opImmidiateValue(-val, header = False)
-	len_b = len(op_b)
-	while b < len_b + val:
-		b += 2
-		op_b = opImmidiateValue(-b, header = False)
-		len_b = len(op_b)
-
-	op_b = opImmidiateValue(-b, header = False, fill = b - len_b)
-	#print(b)
-	return op_b
-
 # @param source that not resolved immidiate values
 # @return source that resolved immidiate values
 def resolveImmediateValue(source):
@@ -108,6 +92,13 @@ def resolveImmediateValue(source):
 		else: # immidiate value
 			ans += opImmidiateValue(ord(op))
 	return ans
+
+def get_source_length(source):
+	if '!' in source:
+		return None
+
+	source_without_label_list = re.split(':[^:]+:', source)
+	return len(''.join(source_without_label_list))
 
 def opCompare(op):
 	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
@@ -123,13 +114,6 @@ def opCompare(op):
 		return list(IS_ZERO_JUMP_TO_1 + IS_NEG)
 	if op is '}': # greater than or equal to zero
 		return list(IS_ZERO_JUMP_TO_1 + IS_POS)
-
-def get_source_length(source):
-	if '!' in source:
-		return None
-
-	source_without_label_list = re.split(':[^:]+:', source)
-	return len(''.join(source_without_label_list))
 
 # @param source that not resolved compares
 # @return source that resolved compares
@@ -176,6 +160,22 @@ def resolveOneJumpForward(source, index = 0):
 
 	return list(ans)
 
+# __p__:B:__q__!B!__r__ => __p__:B:__q__b^__r__
+# @param val is len(q)
+# @return b
+def opImmidiateValueBackward(val):
+	b = val
+	op_b = opImmidiateValue(-val, header = False)
+	len_b = len(op_b)
+	while b < len_b + val:
+		b += 2
+		op_b = opImmidiateValue(-b, header = False)
+		len_b = len(op_b)
+
+	op_b = opImmidiateValue(-b, header = False, fill = b - len_b)
+	#print(b)
+	return op_b
+
 # __p__:B:__q__!B!__r__ => __p__:B:__q__0=b^__r__
 # use len(b) to determine b
 def resolveOneJumpBackward(source, index = 0):
@@ -192,7 +192,8 @@ def resolveOneJumpBackward(source, index = 0):
 		return source
 	p_label_q, label_name, r = source_splitted
 	source_string = source_string.replace('❣', '!')
-	p = p.replace('❣', '!')
+	p_label_q = p_label_q.replace('❣', '!')
+	r = r.replace('❣', '!')
 
 	p_label_q_splitted = p_label_q.rsplit(':' + label_name + ':', 1)
 	if len(p_label_q_splitted) < 2:
@@ -204,9 +205,33 @@ def resolveOneJumpBackward(source, index = 0):
 		return resolveOneJumpBackward(source, index + 1)
 
 	ans = p + ':' + label_name + ':' + q +\
-			'0=' + opImmidiateValueBack(len_q + 3) + '^' + r
+			'0=' + opImmidiateValueBackward(len_q + 3) + '^' + r
 
 	return list(ans)
+
+# __p__:B:__q__!F!__r__!B!__s__:F:__t__ => __p__:B:__q__0=f^__r__0=b^__s__:F:__t__
+# @param overhead_f is len(r+s)+3
+# @param overhead_b is len(q+r)+6
+# @return b
+def opImmidiateValueNested(overhead_f, overhead_b):
+	op_f = ''
+	op_b = ''
+	b = 0
+	len_f = 0
+	len_b = overhead_b - 2
+
+	while b < len_b + len_f + overhead_b:
+		b += 2
+		op_f = opImmidiateValue(overhead_f + len_b, header = False)
+		len_f = len(op_f)
+		op_b = opImmidiateValue(-b, header = False)
+		len_b = len(op_b)
+
+	op_b = opImmidiateValue(-b, header = False, fill = len_b - b - len_f)
+
+	print("f is", overhead_f + len_b, ", b is", b)
+
+	return op_f, op_b
 
 # __p__:B:__q__!F!__r__!B!__s__:F:__t__ => __p__:B:__q__0=f^__r__0=b^__s__:F:__t__
 # use len(f) + len(b) to determine b
@@ -232,7 +257,7 @@ def resolveOneJumpNested(source):
 	s_labelF_t_splitted = s_labelF_t.rsplit(':' + labelF_name + ':', 1)
 	if len(s_labelF_t_splitted) < 2:
 		return source
-	s, t = s_label_t_splitted
+	s, t = s_labelF_t_splitted
 
 	len_q = get_source_length(q)
 	len_r = get_source_length(r)
@@ -240,17 +265,14 @@ def resolveOneJumpNested(source):
 	if len_q is None or len_r is None or len_s is None:
 		return source
 
-	opF = '"+"+"+'
-	opB = '"+"+"+'
+	op_f, op_b = opImmidiateValueNested(len_r + len_s + 3, len_q + len_r + 6)
 
-	ans = p + ':' + labelB_name + ':' + q +\
-			'0=' + opF + '^' +\
-			r +\
-			'0=' + opB + '^' +\
+	ans = 	p + ':' + labelB_name + ':' + q +\
+			'0=' + op_f + '^' + r +\
+			'0=' + op_b + '^' +\
 			s + ':' + labelF_name + ':' + t
 
 	return list(ans)
-
 
 # labels are no longer needed
 def removeLabels(source):
@@ -301,7 +323,10 @@ if __name__ == '__main__':
 	source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
 
 	# single loop
-	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
+	source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
+
+	# nested jump
+	source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
 
 	# fizzbuzz
 	'''
