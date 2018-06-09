@@ -53,7 +53,7 @@ opListSF9WCompare = [
 # pickNumber() to get operand that push val onto stack top
 def opImmidiateValue(val, header = True, fill = None):
 	if val == 0:
-		return '0'
+		return '"-'
 
 	elif val > 0:
 		op = pickNumber(val)
@@ -94,11 +94,21 @@ def get_source_length(source):
 	source_without_label_list = re.split(':[^:]+:', source)
 	return len(''.join(source_without_label_list))
 
-def opCompare(op):
+def opCompare(op, index):
 	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
 	IS_ZERO_JUMP_TO_1 = '"0=""+"++""+"++""++"+0+0+^'
 	IS_POS = '"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
 	IS_NEG = '"[00=+"0="""++""++"++"+"+^00=%00=-"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
+
+	zero_label = '🏅{0}'.format(index)
+	one_label  = '🥇{0}'.format(index)
+	end_label  = '🥈{0}'.format(index)
+	labels     = [zero_label, one_label, end_label]
+
+	IS_ZERO_SKIP_ALL  = '"!{0[2]}!'.format(labels)
+	IS_ZERO_JUMP_TO_1 = '"!{0[1]}!'.format(labels)
+	IS_POS = '"[00=-"!{0[1]}!00=%00=+!{0[0]}!00=%]:{0[0]}:^00=0!{0[2]}!:{0[1]}:0:{0[2]}:'.format(labels)
+	IS_NEG = '"[00=+"!{0[1]}!00=%00=-!{0[0]}!00=%]:{0[0]}:^00=0!{0[2]}!:{0[1]}:0:{0[2]}:'.format(labels)
 
 	if op is '<': # less than zero
 		return list(IS_ZERO_SKIP_ALL + IS_NEG)
@@ -115,9 +125,11 @@ def opCompare(op):
 # a compare operand is always 193 operands after parse
 def resolveCompare(source):
 	ans = []
+	index = 0
 	for op in source:
 		if op in opListSF9WCompare:
-			ans += opCompare(op)
+			ans += opCompare(op, index)
+			index += 1
 		else:
 			ans += op
 	return ans
@@ -171,8 +183,8 @@ def resolveLoop(source, offset = 0):
 				return ""
 
 		# '__M__[__N__]' => '__M__:B:"0=!F!__N__00=!B!:F:'
-		tagB_name = '📜B' + str(loop_start_pos)
-		tagF_name = '📜F' + str(loop_start_pos)
+		tagB_name = 'B📜' + str(loop_start_pos)
+		tagF_name = 'F📜' + str(loop_start_pos)
 		ans += ':' + tagB_name + ':' +\
 		       '"' +\
 		       '!' + tagF_name + '!' +\
@@ -327,25 +339,37 @@ def removeLabels(source):
 def resolveJump(source):
 	before = source
 	after = source
-	while True:
+	changed = True
+	while changed:
 		while True:
 			before = after
+			#print('F')
 			after = resolveJumpOnceForward(before)
 			if before == after:
 				break
+			else:
+				changed = True
+
 		while True:
 			before = after
+			#print('B')
 			after = resolveJumpOnceBackward(before)
 			if before == after:
 				break
+			else:
+				changed = True
 
 		# now there are no jump except _:B:_!A!_!B!_:A:_
 		# special treatment needed
+		#print('N')
 		after = resolveJumpOnceNested(before)
 		if before == after:
 			break
+		else:
+			changed = True
 
-	return removeLabels(after)
+	#return removeLabels(after)
+	return after
 
 if __name__ == '__main__':
 	# print Hello World!
@@ -362,19 +386,20 @@ if __name__ == '__main__':
 	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
-	#source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
+	source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
+	source_string = '0<.'
 
 	# branch zero or non-zero
-	source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
+	#source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
 
 	# single loop
-	source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
+	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
 
 	# nested jump
-	source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
+	#source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
 
 	# nested nested jump
-	source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
+	#source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
 
 	# fizzbuzz
 	'''
@@ -395,11 +420,13 @@ if __name__ == '__main__':
 	source = list(source_string)
 	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
+	print('compare')
+	print(''.join(source))
 	source = resolveLoop(source)
+	print('loop')
 	print(''.join(source))
 	source = resolveJump(source)
-
-	#print(source)
+	print('jump')
 	print(''.join(source))
 
 	if len(sys.argv) > 2:
