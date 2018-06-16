@@ -28,14 +28,13 @@ def solve_recur(equation, ans, row):
 	# return succeed
 	if row >= len(equation):
 		return True
-
-	#if row == 0:
-		#print('start', [execPickedNumber(ans[i]) for i in range(len(ans))], ans)
+	# if row == 0:
+	# 	print('start', [execPickedNumber(ans[i]) for i in range(len(ans))], ans)
 
 	new_ans_evaluated = equation[row][-1]
 	for i in range(len(equation[row]) - 1):
 		if(equation[row][i]):
-			# len('0=') + len(ans[i]) + len('^')
+			# += len('0=') + len(ans[i]) + len('^')
 			new_ans_evaluated += len(ans[i]) + 3
 
 	# jump forwawd or jump backward
@@ -46,25 +45,26 @@ def solve_recur(equation, ans, row):
 		new_ans = pickNumber(new_ans_evaluated)
 
 	old_ans_evaluated = execPickedNumber(ans[row])
-	#print(old_ans_evaluated, new_ans_evaluated)
+	# print(old_ans_evaluated, new_ans_evaluated)
 	if old_ans_evaluated != new_ans_evaluated:
 		if abs(old_ans_evaluated) > abs(new_ans_evaluated):
 			if len(ans[row]) > len(new_ans):
 				ans[row] = new_ans
-				#print(row, "failue(C)", old_ans_evaluated, new_ans_evaluated)
+				# print(row, "failue(C)", old_ans_evaluated, new_ans_evaluated)
 				return False
-			# fill with nop '0+'
+			# reject new_ans
+			# not to be shorter than prev, fill with nop '0+'
 			if len(ans[row]) < len(new_ans):
 				while len(ans[row]) < len(new_ans):
 					ans[row] += '0+'
-
+				# if backward jump, redo from the beginning
 				if equation[row][row]:
-					#print(row, "failue(B)", old_ans_evaluated, new_ans_evaluated)
+					# print(row, "failue(B)", old_ans_evaluated, new_ans_evaluated)
 					return False
 			# do next row
 			return solve_recur(equation, ans, row + 1)
 		else:
-
+			# not to be shorter than prev, fill with nop '0+'
 			while len(ans[row]) > len(new_ans):
 				new_ans += '0+'
 			ans[row] = new_ans
@@ -126,8 +126,8 @@ if __name__ == '__main__':
 		[False, False, False, True , 100],
 	])
 	# equation in random state
-	# A Much bigger equation takes a few seconds.
-	equationList.append(getRandomEquation(100, randrange(100000)))
+	# A Much bigger equation takes about dim^2 * 10 miliseconds.
+	equationList.append(getRandomEquation(50, randrange(100000)))
 
 	for equation in equationList:
 		print('[')
@@ -139,7 +139,7 @@ if __name__ == '__main__':
 		ans_evaluated = [execPickedNumber(ans[i]) for i in range(len(ans))]
 		print('eval:', ans_evaluated)
 		print('len :', [len(ans[i]) for i in range(len(ans))])
-		if equation == [[False, True , 10], [True , True , 10],] and ans_evaluated != [33, -50] or\
-		   equation == [[False, True , 20], [True , True , 20],] and ans_evaluated != [43, -62]:
-			print("INVALID")
-			exit(0)
+		# if equation == [[False, True , 10], [True , True , 10],] and ans_evaluated != [33, -50] or\
+		#   equation == [[False, True , 20], [True , True , 20],] and ans_evaluated != [43, -62]:
+		# 	print("INVALID")
+		# 	exit(0)
