@@ -368,10 +368,13 @@ def resolveJump(source):
 		else:
 			changed = True
 
-	#return removeLabels(after)
+	return removeLabels(after)
 	return after
 
 if __name__ == '__main__':
+	op = opImmidiateValueBackward(21)
+	print(main.execPickedNumber(op), "is", op)
+	exit(0)
 	# print Hello World!
 	#source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
 
@@ -396,7 +399,7 @@ if __name__ == '__main__':
 	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
 
 	# nested jump
-	#source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
+	source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
 
 	# nested nested jump
 	#source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
@@ -418,7 +421,7 @@ if __name__ == '__main__':
 
 	print(source_string)
 	source = list(source_string)
-	source = resolveImmediateValue(source)
+	#source = resolveImmediateValue(source)
 	source = resolveCompare(source)
 	print('compare')
 	print(''.join(source))
