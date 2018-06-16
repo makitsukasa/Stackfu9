@@ -4,22 +4,31 @@
 # 	eval({0}) =            len({1}) + 10
 # 	eval({1}) = len({0}) + len({1}) + 15
 #
-# solve([
+# equation = [
 # 	[False, True , 10],
 # 	[True , True , 15],
-# ])
+# ]
+# solve(equation)
 #
 # {0} = '""++"+"+"+',     eval({0}) = 24, len({0}) = 10
 # {1} = '"""++"+"++""++', eval({1}) = 39, len({1}) = 14
 #
 
-import sys
+from sys import getrecursionlimit, setrecursionlimit
+from random import random, randrange
 from pick_number import pickNumber
 from main import execPickedNumber
 
+# @param equation [[False, True , 10],[True , True , 15],]
+# @param ans ['"-', '"-'] when called,
+#            ['""++"+"+"+', '"""++"+"++""++'] when returns True
+# @return succeed(True) or failue(False)
 def solve_recur(equation, ans, row):
-	if row < 0:
-		return
+	# succeed all rows
+	# return succeed
+	if row >= len(equation):
+		return True
+
 	new_ans_evaluated = equation[row][-1]
 	for i in range(len(equation[row]) - 1):
 		if(equation[row][i]):
@@ -27,28 +36,42 @@ def solve_recur(equation, ans, row):
 
 	new_ans = pickNumber(new_ans_evaluated)
 	if ans[row] != new_ans:
-		if execPickedNumber(ans[row]) > execPickedNumber(new_ans):
-			hoge = new_ans
-			new_ans = ans[row]
-			while len(new_ans) < len(hoge):
-				new_ans += '0+'
-			ans[row] = new_ans
-			solve_recur(equation, ans, row - 1)
+		if execPickedNumber(ans[row]) > new_ans_evaluated:
+			# reject new_ans
+			# fill with nop '0+'
+			while len(ans[row]) < len(new_ans):
+				ans[row] += '0+'
+			# do next row
+			return solve_recur(equation, ans, row + 1)
 		else:
 			ans[row] = new_ans
-			solve_recur(equation, ans, len(equation) - 1)
+			# Redo from the beginning
+			# return failue
+			return False
 	else:
-		solve_recur(equation, ans, row - 1)
+		# do next row
+		return solve_recur(equation, ans, row + 1)
 
+# @param equation [[False, True , 10],[True , True , 15],]
+# @return ['""++"+"+"+', '"""++"+"++""++']
 def solve(equation):
-	rows = len(equation)
+	if len(equation) > getrecursionlimit():
+		setrecursionlimit(len(equation) + 100)
 	ans = ['"-' for _ in range(len(equation))]
-	solve_recur(equation, ans, rows - 1)
+	while not solve_recur(equation, ans, 0):
+		pass
+	return ans
+
+def getRandomEquation(dim, randmax):
+	ans = [[random() < 0.5 for _ in range(dim)] for _ in range(dim)]
+	for i in range(dim):
+		ans[i].append(randrange(randmax))
 	return ans
 
 if __name__ == '__main__':
+
 	# example written at the beginning
-	_equation = [
+	equation = [
 		[False, True , 10],
 		[True , True , 15],
 	]
@@ -57,16 +80,23 @@ if __name__ == '__main__':
 		[False, False,  0],
 		[False, True , 19],
 	]
-	# bigger euation
+	# bigger equation
 	equation = [
 		[False, True , False, False, 100],
 		[True , True , False, True , 140],
 		[False, True , False, True ,  10],
 		[False, False, False, True , 100],
 	]
-	ans = solve(equation)
-	print(ans)
-	ans_evaluated = [execPickedNumber(ans[i]) for i in range(len(ans))]
-	print(ans_evaluated)
-	print([len(ans[i]) for i in range(len(ans))])
+	# much bigger equation in random state
+	# It takes a few seconds.
+	_equation = getRandomEquation(50, randrange(10000))
 
+	print('[')
+	for i in range(len(equation)):
+		print('\t', equation[i], ',', sep = '')
+	print(']')
+
+	ans = solve(equation)
+	print('ans :', ans)
+	print('eval:', [execPickedNumber(ans[i]) for i in range(len(ans))])
+	print('len :', [len(ans[i]) for i in range(len(ans))])
