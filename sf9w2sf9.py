@@ -18,6 +18,7 @@ import sys
 import re
 import main
 from pick_number import pickNumber
+from simultaneous_equation import solve as solveSimEqu
 
 opListSF9 = [
 	'0',
@@ -93,6 +94,9 @@ def get_source_length(source):
 
 	source_without_label_list = re.split(':[^:]+:', source)
 	return len(''.join(source_without_label_list))
+
+def get_source_length_without_label(source):
+	return get_source_length(''.join(source.split('!')[0::2]))
 
 def opCompare(op, index):
 	IS_ZERO_SKIP_ALL  = '"0="""""+"++"+"+"++"++"++^'
@@ -371,42 +375,94 @@ def resolveJump(source):
 	return removeLabels(after)
 	return after
 
+def makeSimEqu_recur(source_string, index, equation):
+	source_string_replaced = source_string.replace('!', '📍', index * 2)
+	source_splitted = source_string_replaced.split('!', 2)
+	if len(source_splitted) < 3:
+		#print("end")
+		return
+	backward, label_name, forward = source_splitted
+	backward      = backward     .replace('📍', '!')
+	forward       = forward      .replace('📍', '!')
+	backward_splitted = backward.split(':' + label_name + ':', 1)
+	forward_splitted  = forward .split(':' + label_name + ':', 1)
+
+	if len(backward_splitted) == 2:
+		#print(label_name, "backward")
+		op_in_jump = backward_splitted[1]
+		jump_in_jump_count = len(op_in_jump.split('!')) // 2
+		for i in range(index, index - jump_in_jump_count - 1, -1):
+			equation[index][i] = True
+		equation[index][-1] = get_source_length_without_label(op_in_jump)
+		#print(equation[index])
+
+	elif len(forward_splitted) == 2:
+		#print(label_name, "forward")
+		op_in_jump = forward_splitted[0]
+		jump_in_jump_count = len(op_in_jump.split('!')) // 2
+		for i in range(index + 1, index + jump_in_jump_count + 1):
+			equation[index][i] = True
+		equation[index][-1] = get_source_length_without_label(op_in_jump)
+		#print(equation[index])
+
+	else:
+		print("error : label not found")
+		return
+
+	makeSimEqu_recur(source_string, index + 1, equation)
+
+def resolveJump_SimEqu(source):
+	source_string = ''.join(source)
+	source_string_splitted = source_string.split('!')
+	opJumpNum = len(source_string_splitted) // 2
+	if opJumpNum != 0:
+		equation = [[False for _ in range(opJumpNum)] for _ in range(opJumpNum)]
+		for i in range(len(equation)):
+			equation[i].append(0)
+		makeSimEqu_recur(source_string, 0, equation)
+		operands = solveSimEqu(equation)
+		#print([main.execPickedNumber(op) for op in operands])
+		ans = ''
+		for i in range(len(source_string_splitted)):
+			if i % 2 == 0:
+				ans += source_string_splitted[i]
+			else:
+				ans += '0=' + operands[i // 2] + '^'
+
+	return list(removeLabels(ans))
+
 if __name__ == '__main__':
-	op = opImmidiateValueBackward(21)
-	print(main.execPickedNumber(op), "is", op)
-	exit(0)
 	# print Hello World!
-	#source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
+	source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
 
 	# single loop
-	#source_string = 'A[00=-".]^D[00="+"+-".]^'
-	#source_string = '00="+""+"++[00=-".]^'
+	_source_string = 'A[00=-".]^D[00="+"+-".]^'
+	_source_string = '00="+""+"++[00=-".]^'
 
 	# nested loop
-	#source_string = '00="+""+"++["[".00=-]^00=-]^'
+	source_string = '00="+""+"++["[".00=-]^00=-]^'
 
 	# positive or negative
-	#source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
+	_source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
-	source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
-	source_string = '0<.'
+	_source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
+	_source_string = '00=<.'
 
 	# branch zero or non-zero
-	#source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
+	_source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
 
 	# single loop
-	#source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
+	_source_string = '00="+""+"++:A1:00=-"."0=!A1!00="+""+"++:A2:00=-"."0=!A2!'
 
 	# nested jump
-	source_string = '00="+"+"+:1:"!2!00=-"."0=!1!:2:^0:3:"!4!00=-"."0=!3!:4:^'
+	_source_string = '00="+"+"+:2:"!1!00=-"."0=!2!:1:^0:4:"!3!00=-"."0=!4!:3:^'
 
 	# nested nested jump
-	#source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
+	_source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
 
 	# fizzbuzz
-	'''
-	source_string = \
+	_source_string = \
 		'000=""+"++""++"+"+["00=-]^[000=%'\
 			'"00=[0=^00=""++-">]^0=0="""++"+"++""++"+^'\
 			'00="""++"++""+"++"+.00="""++"++""+"++""++.00="""+"++""++"+"++"+"..00=%00=+00=%'\
@@ -414,21 +470,20 @@ if __name__ == '__main__':
 			'00=""+"+"+"+"++"+.00="""++"+"++""++""++.00="""+"++""++"+"++"+"..00=%00=+00=%'\
 			'00=%0=0="+^".0=^00="+""+"++.'\
 		']^'
-	'''
 
 	if len(sys.argv) > 1:
 		source_string = open(sys.argv[1]).read()
 
 	print(source_string)
 	source = list(source_string)
-	#source = resolveImmediateValue(source)
+	source = resolveImmediateValue(source)
 	source = resolveCompare(source)
 	print('compare')
 	print(''.join(source))
 	source = resolveLoop(source)
 	print('loop')
 	print(''.join(source))
-	source = resolveJump(source)
+	source = resolveJump_SimEqu(source)
 	print('jump')
 	print(''.join(source))
 
