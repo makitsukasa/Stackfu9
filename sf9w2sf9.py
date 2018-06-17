@@ -82,6 +82,8 @@ if __name__ == '__main__':
 
 	source_sf9 = solve(source)
 
+	#print(source_sf9)
+
 	if len(sys.argv) > 2:
 		open(sys.argv[2], 'w').write(source_sf9)
 
