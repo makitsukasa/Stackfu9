@@ -82,8 +82,11 @@ class Stack:
 
 	def roll(self, depth):
 		if depth <= 0:
-			return
-		self.stack.insert(-depth, self.stack.pop())
+			# left roll
+			self.stack.append(self.stack.pop(len(list) - 1 + depth))
+		else:
+			# right roll
+			self.stack.insert(-depth, self.stack.pop())
 		return
 
 	def __str__(self):
