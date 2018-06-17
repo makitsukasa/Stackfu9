@@ -2,18 +2,8 @@
 # Stackfu9Writable to Stackfu9 interpreter
 #
 # python sf9w2sf9.py input.sf9w output.sf9
-
-# Stackfu9Writable is a Stackfu9 extension.
-# It's sf9 with new sugar syntaxes.
-# - '!LABEL_NAME!' jumps to label if zero
-# - ':LABEL_NAME:' defines label
-# - '[' jumps past the matching ']' if 0
-# - ']' jumps back to the matching '['
-# - '<' evaluates to 1 if the stack top is less    than             zero, and otherwise to 0
-# - '>' evaluates to 1 if the stack top is greater than             zero, and otherwise to 0
-# - '{' evaluates to 1 if the stack top is less    than or equal to zero, and otherwise to 0
-# - '}' evaluates to 1 if the stack top is greater than or equal to zero, and otherwise to 0
-# - 'character' push immediate value up to 126975 \u1efff
+#
+# see sf9w.md
 
 import sys
 import sf9
@@ -47,7 +37,7 @@ def solve(source):
 
 if __name__ == '__main__':
 	# print Hello World!
-	_source = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
+	_source = 'H.e.l.l.o. .w.o.r.l.d.\n.'
 
 	# single loop
 	_source = 'A[00=-".]^D[00="+"+-".]^'

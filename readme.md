@@ -40,3 +40,7 @@ Pop the stack top and insert it at the n-th of the stack.
     ↓roll
     | a b g c d e f
           ^ now g is (4 + 1)th of stack
+
+## extension
+Stackfu9 is simple, but hard to write.
+You have an extension of Stackfu9, [Stackfu9Writable](https://github.com/makitsukasa/Stackfu9/sf9w.md).
