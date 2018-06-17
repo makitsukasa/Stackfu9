@@ -43,4 +43,4 @@ Pop the stack top and insert it at the n-th of the stack.
 
 ## extension
 Stackfu9 is simple, but hard to write.
-You have an extension of Stackfu9, [Stackfu9Writable](https://github.com/makitsukasa/Stackfu9/sf9w.md).
+You have an extension of Stackfu9, [Stackfu9Writable](https://github.com/makitsukasa/Stackfu9/blob/master/sf9w.md).
