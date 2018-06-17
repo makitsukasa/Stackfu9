@@ -14,10 +14,10 @@
 # {1} = '"""+"+"+"++""++-0+0+', eval({1}) = -50, len({1}) = 20
 #
 
-from sys import getrecursionlimit, setrecursionlimit
+from sys import getrecursionlimit, setrecursionlimit, path
 from random import random, randrange
-from pick_number import pickNumber
-from main import execPickedNumber
+import pick_number
+from sf9 import execPickedNumber
 
 # @param equation [[False, True , 10], [True , True , 15],]
 # @param ans ['"-', '"-'] when called,
@@ -40,9 +40,9 @@ def solve_recur(equation, ans, row):
 	# jump forwawd or jump backward
 	if equation[row][row]:
 		new_ans_evaluated *= -1
-		new_ans = '"' + pickNumber(-new_ans_evaluated + 1) + '-'
+		new_ans = '"' + pick_number.pickNumber(-new_ans_evaluated + 1) + '-'
 	else:
-		new_ans = pickNumber(new_ans_evaluated)
+		new_ans = pick_number.pickNumber(new_ans_evaluated)
 
 	old_ans_evaluated = execPickedNumber(ans[row])
 	# print(old_ans_evaluated, new_ans_evaluated)

@@ -2,5 +2,3 @@
 *.o
 *.exe
 __pycache__
-pick_number.cpp
-labeljump.txt

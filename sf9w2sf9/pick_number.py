@@ -1,5 +1,7 @@
 import random
-import main
+import sys
+sys.path.append('..')
+import sf9
 
 # range to calculate accurately
 RANGE = 20000
@@ -122,4 +124,4 @@ if __name__ == '__main__':
 	#main.DEBUG_OUTPUT = False
 	for i in sorted(random.sample(range(limit // 2, limit), 1)):
 		op = '00=' + pickNumber(i) + '.'
-		main.execute(op)
+		sf9.execute(op)
