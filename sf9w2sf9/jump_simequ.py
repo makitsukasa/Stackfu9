@@ -79,11 +79,14 @@ def solve_recur(equation, ans, row):
 # @param equation [[False, True , 10],[True , True , 10],]
 # @return ['""+"+"+"+"++0+', '"""+"+"+"++""++-0+0+']
 def solve(equation):
+	# for e in equation:
+	# 	print(e)
 	if len(equation) > getrecursionlimit():
 		setrecursionlimit(len(equation) + 100)
 	ans = ['"-' for _ in range(len(equation))]
 	while not solve_recur(equation, ans, 0):
 		pass
+	# print([execPickedNumber(ans[i]) for i in range(len(ans))])
 	return ans
 
 def getRandomEquation(dim, randmax):
