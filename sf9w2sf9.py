@@ -104,15 +104,20 @@ def opCompare(op, index):
 	IS_POS = '"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
 	IS_NEG = '"[00=+"0="""++""++"++"+"+^00=%00=-"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0'
 
-	zero_label = '🏅{0}'.format(index)
-	one_label  = '🥇{0}'.format(index)
-	end_label  = '🥈{0}'.format(index)
-	labels     = [zero_label, one_label, end_label]
+	zero_label     = '🏅{0}'.format(index)
+	one_label      = '🥇{0}'.format(index)
+	push_one_label = '🥈{0}'.format(index)
+	end_label      = '🥉{0}'.format(index)
+	labels = [zero_label, one_label, push_one_label, end_label]
 
-	IS_ZERO_SKIP_ALL  = '"!{0[2]}!'.format(labels)
-	IS_ZERO_JUMP_TO_1 = '"!{0[1]}!'.format(labels)
-	IS_POS = '"[00=-"!{0[1]}!00=%00=+!{0[0]}!00=%]:{0[0]}:^00=0!{0[2]}!:{0[1]}:0:{0[2]}:'.format(labels)
-	IS_NEG = '"[00=+"!{0[1]}!00=%00=-!{0[0]}!00=%]:{0[0]}:^00=0!{0[2]}!:{0[1]}:0:{0[2]}:'.format(labels)
+	IS_ZERO_SKIP_ALL  = '"!{0[3]}!'.format(labels)
+	IS_ZERO_JUMP_TO_1 = '"!{0[2]}!'.format(labels)
+	IS_POS = '"[00=-"!{0[1]}!00=%00=+"!{0[0]}!00=%]'\
+			':{0[1]}:^"-^0:{0[2]}:0=0!{0[3]}!:{0[0]}:^"-:{0[3]}:'
+	IS_NEG = '"[00=+"!{0[1]}!00=%00=-"!{0[0]}!00=%]'\
+			':{0[1]}:^"-^0:{0[2]}:0=0!{0[3]}!:{0[0]}:^"-:{0[3]}:'
+	IS_POS = IS_POS.format(labels)
+	IS_NEG = IS_NEG.format(labels)
 
 	if op is '<': # less than zero
 		return list(IS_ZERO_SKIP_ALL + IS_NEG)
@@ -433,7 +438,7 @@ def resolveJump_SimEqu(source):
 
 if __name__ == '__main__':
 	# print Hello World!
-	source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
+	_source_string = 'H.e.l.l.o. .w.o.r.l.d.!.\n.'
 
 	# single loop
 	_source_string = 'A[00=-".]^D[00="+"+-".]^'
@@ -446,8 +451,8 @@ if __name__ == '__main__':
 	_source_string = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
 
 	# 2<  2>  2{  2}  -1<  -1>  -1{  -1}  0<  0>  0{  0}
-	_source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
-	_source_string = '00=<.'
+	source_string = '00="+<.00="+>.00="+{.00="+}.00=""+-<.00=""+->.00=""+-{.00=""+-}.0<.0>.0{0+.0}.'
+	_source_string = '0{.'
 
 	# branch zero or non-zero
 	_source_string = '00="+"+"+""!A1!.00=.:A1:0=!A2!.0.:A2:'
@@ -462,8 +467,9 @@ if __name__ == '__main__':
 	_source_string = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
 
 	# fizzbuzz
-	_source_string = \
-		'000=""+"++""++"+"+["00=-]^[000=%'\
+	# it takes a few seconds to execute
+	source_string = \
+		'000=""+"++""++"+"+"+["00=-]^[000=%'\
 			'"00=[0=^00=""++-">]^0=0="""++"+"++""++"+^'\
 			'00="""++"++""+"++"+.00="""++"++""+"++""++.00="""+"++""++"+"++"+"..00=%00=+00=%'\
 			'"00=[0=^00=""+"++-">]^0=0="""++""++"++"+"+^'\
