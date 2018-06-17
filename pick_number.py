@@ -46,8 +46,8 @@ def recur(target, is_1_origin = True):
 		return ans_memo[target]
 
 	if target == 0:
-		print("target is zero")
-		ans = 'VERY_VERY_LONG_DUMMY_STRING'
+		#print("target is zero")
+		ans = '"-'
 		ans_memo[target] = ans
 		return ans
 
