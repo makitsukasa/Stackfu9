@@ -93,7 +93,7 @@ def recur(target, is_1_origin = True):
 					ans = ans if (len(ans) <= len(ans2)) else ans2
 
 	# ans is None => no idea => compromise
-	# ans is 1_origin and odd => may be shorten by light operation
+	# ans is 1_origin and odd => may be shorten
 	if ans is None or is_1_origin and target % 2 == 1:
 		ans2 = '"' + recur(target - 1) + '+'
 		if ans is None:

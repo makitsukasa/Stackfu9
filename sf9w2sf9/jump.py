@@ -46,6 +46,7 @@ def removeLabels(source):
 def solve(source):
 	source_splitted = source.split('!')
 	opJumpNum = len(source_splitted) // 2
+	ans = ''
 	if opJumpNum != 0:
 		equation = [[False for _ in range(opJumpNum)] for _ in range(opJumpNum)]
 		for i in range(len(equation)):
@@ -53,11 +54,12 @@ def solve(source):
 		makeSimEqu_recur(source, 0, equation)
 		operands = jump_simequ.solve(equation)
 		#print([main.execPickedNumber(op) for op in operands])
-		ans = ''
 		for i in range(len(source_splitted)):
 			if i % 2 == 0:
 				ans += source_splitted[i]
 			else:
 				ans += '0=' + operands[i // 2] + '^'
+	else:
+		ans = source
 
 	return removeLabels(ans)

@@ -86,4 +86,4 @@ if __name__ == '__main__':
 
 	#sf9.DEBUG_OUTPUT = True
 	#sf9.OUTPUT_AS_CHARACTER = True
-	sf9.execute(source_sf9)
+	#sf9.execute(source_sf9)

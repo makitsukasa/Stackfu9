@@ -1,5 +1,5 @@
 import lib
-#import pick_number
+import pick_number
 
 # bf9 does not follow immidiate value
 # pickNumber() to get operand that push val onto stack top
@@ -8,7 +8,7 @@ def opImmidiateValue(val, header = True, fill = None):
 		return '"-'
 
 	elif val > 0:
-		op = pickNumber(val)
+		op = pick_number.pickNumber(val)
 
 		if fill is not None:
 			while len(op) < fill:
