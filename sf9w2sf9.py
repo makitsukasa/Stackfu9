@@ -1,5 +1,5 @@
-# s    f 9w        2  s    f 9             .py
-# Stackfu9Writable to Stackfu9 interpreter
+# s    f 9w        2  s    f 9           .py
+# Stackfu9Writable to Stackfu9 transpiler
 #
 # python sf9w2sf9.py input.sf9w output.sf9
 #
@@ -14,6 +14,7 @@ from loop            import solve as solveLoop
 from jump            import solve as solveJump
 
 def solve(source):
+	print_flag = True
 	print_flag = False
 	if print_flag: print(source)
 
@@ -44,7 +45,7 @@ if __name__ == '__main__':
 	_source = '00="+""+"++[00=-".]^'
 
 	# nested loop
-	source = '00="+""+"++["[".00=-]^00=-]^'
+	_source = '00="+""+"++["[".00=-]^00=-]^'
 
 	# positive or negative
 	_source = '00="+"+"+"[00=-"0="""++""++"++"+"+^00=%00=+"0=""+"+"+"+"+"++^00=%]^0=^00="""+"++^^0=^0.'
