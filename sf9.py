@@ -4,7 +4,7 @@ import sys, io;
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 DEBUG_OUTPUT = False
-OUTPUT_AS_CHARACTER = False
+OUTPUT_AS_CHARACTER = True
 
 # element of the stack
 # each element contains bignum

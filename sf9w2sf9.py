@@ -7,6 +7,7 @@
 
 import sys
 import sf9
+sys.path.append('Stackfu9/sf9w2sf9')
 sys.path.append('sf9w2sf9')
 from immediate_value import solve as solveImmediateValue
 from compare         import solve as solveCompare
@@ -93,6 +94,6 @@ if __name__ == '__main__':
 	if len(sys.argv) > 2:
 		open(sys.argv[2], 'w').write(source_sf9)
 
-	sf9.DEBUG_OUTPUT = True
+	#sf9.DEBUG_OUTPUT = True
 	#sf9.OUTPUT_AS_CHARACTER = True
-	sf9.execute(source_sf9)
+	#sf9.execute(source_sf9)
