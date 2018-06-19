@@ -120,6 +120,9 @@ def pickNumber(specific_number = None):
 	return ans
 
 if __name__ == '__main__':
+	print(pickNumber(65536))
+	exit(0)
+
 	limit = 2 ** 31
 	#main.DEBUG_OUTPUT = False
 	for i in sorted(random.sample(range(limit // 2, limit), 1)):

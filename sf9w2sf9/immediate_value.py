@@ -31,7 +31,13 @@ def opImmidiateValue(val, header = True, fill = None):
 # @param source that not resolved immidiate values
 # @return source that resolved immidiate values
 def solve(source):
-	ans = ''
+
+	source_splitted = source.split('@')
+	for i in range(0, len(source_splitted), 2):
+		decimal = int(source_splitted[i])
+		source_splitted[i] = pick_number.pickNumber(decimal)
+	ans = ''.join(source_splitted)
+
 	for op in source:
 		if op in lib.opListSF9 or op in lib.opListSF9W:
 			ans += op

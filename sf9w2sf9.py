@@ -18,6 +18,9 @@ def solve(source):
 	print_flag = False
 	if print_flag: print(source)
 
+	source = source.replace('\n', '')
+	source = source.replace(' ', '')
+
 	source = solveImmediateValue(source)
 	if print_flag: print('immediate value')
 	if print_flag: print(source)
@@ -66,9 +69,12 @@ if __name__ == '__main__':
 	# nested nested jump
 	_source = '00="+""+"++:O1:""!O2!:I1:"!I2!00=-"."0=!I1!:I2:^00=-"0=!O1!:O2:^'
 
+	# push 65536 zeros
+	source = '00="+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+[000=%00=-]^'
+
 	# fizzbuzz
 	# it takes a few seconds to execute
-	source = \
+	_source = \
 		'0x["00=-]^[000=%'\
 			'"00=[0=^00=""++-">]^0=!ENDFIZZ!'\
 			'F.i.z"..00=%00=+00=%:ENDFIZZ:'\
@@ -87,6 +93,6 @@ if __name__ == '__main__':
 	if len(sys.argv) > 2:
 		open(sys.argv[2], 'w').write(source_sf9)
 
-	#sf9.DEBUG_OUTPUT = True
+	sf9.DEBUG_OUTPUT = True
 	#sf9.OUTPUT_AS_CHARACTER = True
-	#sf9.execute(source_sf9)
+	sf9.execute(source_sf9)

@@ -11,8 +11,8 @@ def makeSimEqu_recur(source_string, index, equation):
 	backward, label_name, forward = source_splitted
 	backward      = backward.replace('📍', '!')
 	forward       = forward .replace('📍', '!')
-	backward_splitted = backward.split(':' + label_name + ':', 1)
-	forward_splitted  = forward .split(':' + label_name + ':', 1)
+	backward_splitted = backward.rsplit(':' + label_name + ':', 1)
+	forward_splitted  = forward .split (':' + label_name + ':', 1)
 
 	if len(backward_splitted) == 2:
 		#print(label_name, "backward")
