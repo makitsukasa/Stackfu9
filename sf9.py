@@ -83,7 +83,7 @@ class Stack:
 	def roll(self, depth):
 		if depth <= 0:
 			# left roll
-			self.stack.append(self.stack.pop(len(list) - 1 + depth))
+			self.stack.append(self.stack.pop(len(self.stack) - 1 + depth))
 		else:
 			# right roll
 			self.stack.insert(-depth, self.stack.pop())
@@ -186,7 +186,7 @@ def execute(source):
 		while i < len(source):
 			i += opDic[source[i]]() + 1
 
-	print()
+	#print()
 
 if __name__ == '__main__':
 	#DEBUG_OUTPUT = True

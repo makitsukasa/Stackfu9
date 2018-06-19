@@ -112,6 +112,12 @@ def pickNumber(specific_number = None):
 	if specific_number is not None:
 		begin = end = specific_number
 
+	if specific_number < 0:
+		return '"' + pickNumber(-specific_number + 1) + '-'
+
+	if specific_number == 16777216:
+		return '"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+"+'
+
 	for i in range(begin, end + 1):
 		ans = recur(i)
 		if __name__ == '__main__':

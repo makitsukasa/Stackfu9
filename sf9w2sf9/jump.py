@@ -14,20 +14,20 @@ def makeSimEqu_recur(source_string, index, equation):
 	backward_splitted = backward.rsplit(':' + label_name + ':', 1)
 	forward_splitted  = forward .split (':' + label_name + ':', 1)
 
-	if len(backward_splitted) == 2:
-		#print(label_name, "backward")
-		op_in_jump = backward_splitted[1]
-		jump_in_jump_count = len(op_in_jump.split('!')) // 2
-		for i in range(index, index - jump_in_jump_count - 1, -1):
-			equation[index][i] = True
-		equation[index][-1] = lib.get_source_length_without_label(op_in_jump)
-		#print(equation[index])
-
-	elif len(forward_splitted) == 2:
+	if len(forward_splitted) == 2:
 		#print(label_name, "forward")
 		op_in_jump = forward_splitted[0]
 		jump_in_jump_count = len(op_in_jump.split('!')) // 2
 		for i in range(index + 1, index + jump_in_jump_count + 1):
+			equation[index][i] = True
+		equation[index][-1] = lib.get_source_length_without_label(op_in_jump)
+		#print(equation[index])
+
+	elif len(backward_splitted) == 2:
+		#print(label_name, "backward")
+		op_in_jump = backward_splitted[1]
+		jump_in_jump_count = len(op_in_jump.split('!')) // 2
+		for i in range(index, index - jump_in_jump_count - 1, -1):
 			equation[index][i] = True
 		equation[index][-1] = lib.get_source_length_without_label(op_in_jump)
 		#print(equation[index])

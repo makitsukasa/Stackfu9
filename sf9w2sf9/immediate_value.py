@@ -35,6 +35,7 @@ def solve(source):
 	source_splitted = source.split('@')
 	for i in range(1, len(source_splitted), 2):
 		decimal = int(source_splitted[i])
+		# print(decimal)
 		source_splitted[i] = '00=' + pick_number.pickNumber(decimal)
 	source = ''.join(source_splitted)
 
